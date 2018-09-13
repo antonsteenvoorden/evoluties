@@ -1,0 +1,11 @@
+.DS_Store
+.idea/
+*.class
+tmp/
+*.jar
+!contest.jar
+!testrun.jar
+!SchaffersEvaluation.class
+!SphereEvaluation.class
+!KatsuuraEvaluation.class
+!BentCigarFunction.class
