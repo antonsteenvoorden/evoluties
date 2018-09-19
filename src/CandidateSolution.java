@@ -1,7 +1,7 @@
 import java.util.Random;
 import java.util.Arrays;
 
-public class CandidateSolution {
+public class CandidateSolution implements Comparable<CandidateSolution>{
     double[] genotype;
     double[] phenotype;
     double fitness;
@@ -83,6 +83,15 @@ public class CandidateSolution {
       }
       result += "}";
       return result;
+    }
+
+    public int compareTo(CandidateSolution sol1) {
+      if(this.getFitness() > sol1.getFitness()){
+        return -1;
+      }else if(this.getFitness() < sol1.getFitness()){
+        return 1;
+      }
+      return 0;
     }
 
 }
