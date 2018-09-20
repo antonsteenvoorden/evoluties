@@ -9,15 +9,18 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     Random random;
     private static int minAllele = -5;
     private static int maxAllele = 5;
+    private double stepSize = 0.1; // maybe evolve this as well later
 
-
-    public CandidateSolution(Random random) {
+    public CandidateSolution(Random random, double mutationChance) {
         this.genotype = new double[10];
         this.phenotype = genotype; // zoiets
         this.fitness = Double.MIN_VALUE;
         this.random = random;
-        this.mutationChance = 0.2;
-        // doe randmo shit met range
+        this.mutationChance = mutationChance;
+        if(this.mutationChance == 0 ) {
+            this.mutationChance = 0.2;
+        }
+        // doe random shit met range
         init();
     }
 
@@ -30,7 +33,14 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     public double[] getGenotype(){
       return this.genotype;
     }
-
+    public double getGenomeAtIndex(int index) {
+        if(index < this.genotype.length -1) {
+            return this.genotype[index];
+        } else {
+            //ERROR
+        }
+        return 0;
+    }
     public double[] getHead(){
       int cutOff = genotype.length/2;
       return Arrays.copyOfRange(this.genotype, 0, cutOff);
@@ -70,7 +80,7 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     public void mutate() {
       for(int i=0; i<genotype.length; i++){
         if(this.random.nextDouble() < this.mutationChance){
-          genotype[i] += this.random.nextGaussian() * 0.1;
+          genotype[i] += this.random.nextGaussian() * this.stepSize; //step size
         }
       }
     }
@@ -85,6 +95,7 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
       return result;
     }
 
+    // gets called by Collection sort
     public int compareTo(CandidateSolution sol1) {
       if(this.getFitness() > sol1.getFitness()){
         return -1;

@@ -3,7 +3,6 @@ import org.vu.contest.ContestEvaluation;
 
 import java.util.Random;
 import java.util.Properties;
-import java.util.Arrays;
 
 public class player45 implements ContestSubmission {
     Random rnd_;
@@ -45,18 +44,19 @@ public class player45 implements ContestSubmission {
         // Run your algorithm here
         final int min = -5;
         final int max = 5;
-        final int populationSize = 10;
-        final int numberOfParentsSelections = 5;
+        final int populationSize = 100;
+        final int numberOfParentsSelections = 50;
 
         int evals = 0;
         int generation = 0;
 
         // init population
+        // we should probably allow these variables to be set from the command line
         Population population = new Population(populationSize, numberOfParentsSelections, evaluation_, rnd_);
         evals += populationSize;
         // calculate fitness
         while (evals < evaluations_limit_) {
-            population.generation();
+            population.createNewGeneration();
             generation++;
             evals += numberOfParentsSelections*2;
         }
