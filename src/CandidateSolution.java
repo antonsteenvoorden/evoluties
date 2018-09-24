@@ -6,18 +6,18 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     double[] phenotype;
     double fitness;
     double mutationChance;
+    double gaussianStandardDeviation;
     Random random;
     private static int minAllele = -5;
     private static int maxAllele = 5;
 
 
-    public CandidateSolution(Random random) {
+    public CandidateSolution(Random random, double mutationChance, double gaussianStandardDeviation) {
         this.genotype = new double[10];
-        this.phenotype = genotype; // zoiets
         this.fitness = Double.MIN_VALUE;
         this.random = random;
-        this.mutationChance = 0.2;
-        // doe randmo shit met range
+        this.mutationChance = mutationChance;
+        this.gaussianStandardDeviation = gaussianStandardDeviation;
         init();
     }
 
@@ -68,7 +68,7 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     public void mutate() {
       for(int i=0; i<genotype.length; i++){
         if(this.random.nextDouble() < this.mutationChance){
-          genotype[i] += this.random.nextGaussian() * 0.1;
+          genotype[i] += this.random.nextGaussian() * this.gaussianStandardDeviation;
         }
       }
     }

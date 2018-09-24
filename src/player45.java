@@ -43,16 +43,17 @@ public class player45 implements ContestSubmission {
 
     public void run() {
         // Run your algorithm here
-        final int min = -5;
-        final int max = 5;
-        final int populationSize = 10;
+        final int populationSize = 100;
         final int numberOfParentsSelections = 5;
+
+        final double mutationChance = 0.1;
+        final double gaussianStandardDeviation = 1;
 
         int evals = 0;
         int generation = 0;
 
         // init population
-        Population population = new Population(populationSize, numberOfParentsSelections, evaluation_, rnd_);
+        Population population = new Population(populationSize, numberOfParentsSelections, mutationChance, gaussianStandardDeviation, evaluation_, rnd_);
         evals += populationSize;
         // calculate fitness
         while (evals < evaluations_limit_) {

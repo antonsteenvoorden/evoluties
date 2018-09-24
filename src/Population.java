@@ -10,15 +10,19 @@ public class Population {
     ContestEvaluation evaluation;
     int populationSize;
     int numberOfParentsSelections;
+    double mutationChance;
+    double gaussianStandardDeviation;
     double bestFitness;
     CandidateSolution bestCandidate;
     Random random;
 
-    Population(int populationSize, int numberOfParentsSelections, ContestEvaluation evaluation, Random random){
+    Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
         this.populationSize = populationSize;
         this.numberOfParentsSelections = numberOfParentsSelections;
+        this.mutationChance = mutationChance;
+        this.gaussianStandardDeviation = gaussianStandardDeviation;
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
@@ -27,7 +31,7 @@ public class Population {
 
     public void init (){
         for (int p = 0; p < this.populationSize; p++) {
-            CandidateSolution tmpSolution = new CandidateSolution(this.random);
+            CandidateSolution tmpSolution = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
             this.population.add(tmpSolution);
         }
         evalutePopulation();
@@ -101,7 +105,7 @@ public class Population {
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
-      CandidateSolution child = new CandidateSolution(this.random);
+      CandidateSolution child = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
       int cutOff = randInt(0, 10);
       child.setGenotype(concatenateArrays(c1.getHead(cutOff), c2.getTail(cutOff)));
       return child;
