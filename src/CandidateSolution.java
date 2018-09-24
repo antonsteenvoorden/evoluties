@@ -31,13 +31,11 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
       return this.genotype;
     }
 
-    public double[] getHead(){
-      int cutOff = genotype.length/2;
+    public double[] getHead(int cutOff){
       return Arrays.copyOfRange(this.genotype, 0, cutOff);
     }
 
-    public double[] getTail(){
-      int cutOff = genotype.length/2;
+    public double[] getTail(int cutOff){
       return Arrays.copyOfRange(this.genotype, cutOff, genotype.length);
     }
 

@@ -102,7 +102,8 @@ public class Population {
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
       CandidateSolution child = new CandidateSolution(this.random);
-      child.setGenotype(concatenateArrays(c1.getHead(), c2.getTail()));
+      int cutOff = randInt(0, 10);
+      child.setGenotype(concatenateArrays(c1.getHead(cutOff), c2.getTail(cutOff)));
       return child;
     }
 
@@ -128,6 +129,10 @@ public class Population {
             offset += array.length;
         }
         return result;
+    }
+
+    public int randInt(int min, int max) {
+      return this.random.nextInt((max - min) + 1) + min;
     }
 
 
