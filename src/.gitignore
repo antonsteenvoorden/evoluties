@@ -10,3 +10,4 @@ tmp/
 !SphereEvaluation.class
 !KatsuuraEvaluation.class
 !BentCigarFunction.class
+*.iml
