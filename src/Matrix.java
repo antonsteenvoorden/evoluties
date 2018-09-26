@@ -758,6 +758,14 @@ public class Matrix implements Cloneable, java.io.Serializable {
       return X;
    }
 
+   public double norm(){
+     double result = 0;
+     for(int i=0; i<m; i++){
+       result += A[i][0] * A[i][0];
+     }
+     return Math.sqrt(result);
+   }
+
    /** LU Decomposition
    @return     LUDecomposition
    @see LUDecomposition
@@ -900,6 +908,83 @@ public class Matrix implements Cloneable, java.io.Serializable {
       return A;
    }
 
+   public Matrix diagonal(Boolean reverse){
+     if(!reverse){
+       Matrix A = new Matrix(m, m);
+       double[][] X = A.getArray();
+       for (int i = 0; i < m; i++) {
+          for (int j = 0; j < m; j++) {
+             X[i][j] = (i == j) ? this.get(i, 0) : 0.0;
+          }
+       }
+       return A;
+     }else{
+       Matrix A = new Matrix(m, 1);
+       double[][] X = A.getArray();
+       for (int i = 0; i < m; i++) {
+          for (int j = 0; j < m; j++) {
+             if(i == j) X[i][0] = this.get(i,j);
+          }
+       }
+       return A;
+     }
+   }
+
+   public Matrix triu(int offset){
+     Matrix A = new Matrix(m, m);
+     double[][] X = A.getArray();
+     for (int i = 0; i < m; i++) {
+        for (int j = 0; j < m; j++) {
+           X[i][j] = (j >= (i+offset)) ? this.get(i, j) : 0.0;
+        }
+     }
+     return A;
+   }
+
+   public Matrix power2() {
+     Matrix A = new Matrix(this.m, this.m);
+     double[][] X = A.getArray();
+     for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+           X[i][j] = this.get(i, j) *this.get(i, j);
+        }
+     }
+     return A;
+   }
+
+   public Matrix sqrt() {
+     Matrix A = new Matrix(this.m, this.m);
+     double[][] X = A.getArray();
+     for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+           X[i][j] = Math.sqrt(this.get(i, j));
+        }
+     }
+     return A;
+   }
+
+   public Matrix powerinverse() {
+     Matrix A = new Matrix(this.m, this.m);
+     double[][] X = A.getArray();
+     for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+           X[i][j] = 1/this.get(i, j);
+        }
+     }
+     return A;
+   }
+
+   public void print(){
+     for(int i=0; i<m; i++){
+       for(int j=0; j<n; j++){
+         if(j == 0) System.out.printf("[ ");
+         System.out.printf("%.2f ", A[i][j]);
+         if(j == (n-1)) System.out.printf("]\n");
+       }
+     }
+     System.out.printf("\n");
+   }
+
 
    /** Print the matrix to stdout.   Line the elements up in columns
      * with a Fortran-like 'Fw.d' style format.
@@ -971,60 +1056,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
       output.println();   // end with blank line.
    }
 
-   /** Read a matrix from a stream.  The format is the same the print method,
-     * so printed matrices can be read back in (provided they were printed using
-     * US Locale).  Elements are separated by
-     * whitespace, all the elements for each row appear on a single line,
-     * the last row is followed by a blank line.
-   @param input the input stream.
-   */
-
-   public static Matrix read (BufferedReader input) throws java.io.IOException {
-      StreamTokenizer tokenizer= new StreamTokenizer(input);
-
-      // Although StreamTokenizer will parse numbers, it doesn't recognize
-      // scientific notation (E or D); however, Double.valueOf does.
-      // The strategy here is to disable StreamTokenizer's number parsing.
-      // We'll only get whitespace delimited words, EOL's and EOF's.
-      // These words should all be numbers, for Double.valueOf to parse.
-
-      tokenizer.resetSyntax();
-      tokenizer.wordChars(0,255);
-      tokenizer.whitespaceChars(0, ' ');
-      tokenizer.eolIsSignificant(true);
-      java.util.Vector v = new java.util.Vector();
-
-      // Ignore initial empty lines
-      while (tokenizer.nextToken() == StreamTokenizer.TT_EOL);
-      if (tokenizer.ttype == StreamTokenizer.TT_EOF)
-	throw new java.io.IOException("Unexpected EOF on matrix read.");
-      do {
-         v.addElement(Double.valueOf(tokenizer.sval)); // Read & store 1st row.
-      } while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
-
-      int n = v.size();  // Now we've got the number of columns!
-      double row[] = new double[n];
-      for (int j=0; j<n; j++)  // extract the elements of the 1st row.
-         row[j]=((Double)v.elementAt(j)).doubleValue();
-      v.removeAllElements();
-      v.addElement(row);  // Start storing rows instead of columns.
-      while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
-         // While non-empty lines
-         v.addElement(row = new double[n]);
-         int j = 0;
-         do {
-            if (j >= n) throw new java.io.IOException
-               ("Row " + v.size() + " is too long.");
-            row[j++] = Double.valueOf(tokenizer.sval).doubleValue();
-         } while (tokenizer.nextToken() == StreamTokenizer.TT_WORD);
-         if (j < n) throw new java.io.IOException
-            ("Row " + v.size() + " is too short.");
-      }
-      int m = v.size();  // Now we've got the number of rows.
-      double[][] A = new double[m][];
-      v.copyInto(A);  // copy the rows out of the vector
-      return new Matrix(A);
-   }
 
 
 /* ------------------------

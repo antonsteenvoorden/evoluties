@@ -1,12 +1,12 @@
 
 #!/bin/bash
 
-javac -cp contest.jar player45.java CandidateSolution.java
-jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class
+javac -cp contest.jar player45.java CandidateSolution.java Matrix.java CholeskyDecomposition.java EigenvalueDecomposition.java LUDecomposition.java Maths.java QRDecomposition.java SingularValueDecomposition.java
+jar cmf MainClass.txt submission.jar player45.class CandidateSolution.class Matrix.class CholeskyDecomposition.class EigenvalueDecomposition.class LUDecomposition.class Maths.class QRDecomposition.class SingularValueDecomposition.class
 
 if [ "$1" = "Bent" ]; then
     echo "\nBent Cigar"
-    java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=1
+    java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=2
 fi
 
 if [ "$1" = "Sphere" ]; then

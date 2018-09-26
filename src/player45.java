@@ -54,161 +54,34 @@ public class player45 implements ContestSubmission {
         return randomValue;
     }
 
-    private double[] vector_times_vector(double[] v1, double[] v2){
-      double[] result = new double[v1.length];
-      for(int i=0; i<v1.length; i++){
-        result[i] = v1[i]*v2[i];
-      }
-      return result;
-    }
-
-
-    private double[] matrix_times_vector(double[][] m, double[] v){
-      double[] result = new double[m.length];
-      for(int i=0; i<m.length; i++){
-        double _result = 0;
-        for(int j=0; j<m[0].length; j++){
-          _result += m[i][j] * v[j];
-        }
-        result[i] = _result;
-      }
-      return result;
-    }
-
-
-
-    private double[][] x_times_matrix(double x, double[][] m){
-      for(int i=0; i<m.length; i++){
-        for(int j=0; j<m[0].length; j++){
-          m[i][j] = m[i][j] * x;
-        }
-      }
-      return m;
-    }
-
-    private double[] x_times_vector(double x, double[] v){
-      for(int i=0; i<v.length; i++){
-        v[i] = v[i] * x;
-      }
-      return v;
-    }
-
-    private double[] vector_plus_vector(double[] v1, double[] v2){
-      double[] result = new double[v1.length];
-      for(int i=0; i<v1.length; i++){
-        result[i] = v1[i] + v2[i];
-      }
-      return result;
-    }
-
-    private double[] vector_minus_vector(double[] v1, double[] v2){
-      double[] result = new double[v1.length];
-      for(int i=0; i<v1.length; i++){
-        result[i] = v1[i] - v2[i];
-      }
-      return result;
-    }
-
-    private double[][] matrix_plus_matrix(double[][] m1, double[][] m2){
-      double[][] result = new double[m1.length][m1[0].length];
-      for(int i=0; i<m1.length; i++){
-        for(int j=0; j<m2[0].length; j++){
-          result[i][j] = m1[i][j] + m2[i][j];
-        }
-      }
-      return result;
-    }
-
-
-    public static double norm(double[] array) {
-
-    if (array != null) {
-        int n = array.length;
-        double sum = 0.0;
-
-        for (int i = 0; i < n; i++) {
-            sum += array[i] * array[i];
-        }
-        return Math.pow(sum, 0.5);
-    } else
-        return 0.0;
-      }
-
-      public double[][] diagonal(double[] v1){
-        double[][] result = new double[v1.length][v1.length];
-        for(int i=0; i<v1.length; i++){
-          for(int j=0; j<v1.length; j++){
-            if(i == j){
-              result[i][j] = v1[i];
-            }else{
-              result[i][j] = 0;
-            }
-          }
-        }
-        return result;
-      }
-
-      public static double[][] matrix_times_matrix(double[][] m1, double[][] m2) {
-    int m1ColLength = m1[0].length; // m1 columns length
-    int m2RowLength = m2.length;    // m2 rows length
-    if(m1ColLength != m2RowLength) return null; // matrix multiplication is not possible
-    int mRRowLength = m1.length;    // m result rows length
-    int mRColLength = m2[0].length; // m result columns length
-    double[][] mResult = new double[mRRowLength][mRColLength];
-    for(int i = 0; i < mRRowLength; i++) {         // rows from m1
-        for(int j = 0; j < mRColLength; j++) {     // columns from m2
-            for(int k = 0; k < m1ColLength; k++) { // columns from m1
-                mResult[i][j] += m1[i][k] * m2[k][j];
-            }
-        }
-    }
-    return mResult;
-}
-
-
-
-    public static double[][] transpose(double [][] m){
-        double[][] temp = new double[m[0].length][m.length];
-        for (int i = 0; i < m.length; i++)
-            for (int j = 0; j < m[0].length; j++)
-                temp[j][i] = m[i][j];
-        return temp;
-    }
-
-
-
-
-
 
     public void run() {
         // Run your algorithm here
+        Maths matrixMath = new Maths();
+
         int evals = 0;
-        int generations = 0;
 
         //initialization
         int N = 10;
-        double[] xmean = new double[N];
+        double[][] _xmean = new double[N][1];
         for(int i=0; i<N; i++){
-          xmean[i] = getRandomNumberInRange(-5, 5);
+          _xmean[i][0] = getRandomNumberInRange(-5, 5);
         }
-
+        Matrix xmean = new Matrix(_xmean);
         double sigma = 0.3;
         int lambda = 4+(int)Math.floor(3*Math.log(N));
+        lambda = 100;
         int mu = (int)Math.floor(lambda/2);
-        double[] weigths = new double[mu];
-        double weights_total = 0;
-        double weights_2_total = 0;
+
+        double[][] _weigths = new double[mu][1];
         for(int i=0; i<mu; i++){
-          double _w =  Math.log(mu+1/2) - Math.log(i+1);
-          // double _w = mu - i + 1;
-          weights_total += _w;
-          weights_2_total += (_w * _w);
-          weigths[i] = _w;
+          _weigths[i][0] = Math.log(mu+1/2) - Math.log(i+1);
+          // _weigths[i][0] = mu + 1 - i;
         }
-        for(int i=0; i<mu; i++){
-          weigths[i] = weigths[i] /weights_total;
-        }
-        double mu_eff  = (weights_total*weights_total)/weights_2_total;
+        Matrix weigths = new Matrix(_weigths);
+        weigths = matrixMath.normalize(weigths);
+        Matrix weigths_quadratic = weigths.power2();
+        double mu_eff  = matrixMath.sum(weigths)/matrixMath.sum(weigths_quadratic);
 
         //adaption
         double cc = (4+mu_eff/N) / (N+4+2*mu_eff/N);
@@ -218,97 +91,78 @@ public class player45 implements ContestSubmission {
         double damps = 1 + 2 * Math.max(0, Math.sqrt((mu_eff-1) / (N+1))-1) + cs;
         boolean hsig;
 
-        double[] pc = new double[N];
-        double[] ps = new double[N];
-        double[][] B = new double[N][N];
-        double[] D = new double[N];
-        double[][] C = new double[N][N];
-        double[][] C_invsqrt = new double[N][N];
-        for(int i=0; i<N; i++){
-          pc[i] = 0;
-          ps[i] = 0;
-          B[i][i] = 1;
-          D[i] = 1;
-          C[i][i] = 1;
-          C_invsqrt[i][i] = 1;
-        }
+        Matrix pc = new Matrix(N, 1, 0);
+        Matrix ps = new Matrix(N, 1, 0);
+        Matrix B = matrixMath.identity(N);
+        Matrix D = new Matrix(N, 1, 1);
+        Matrix C = B.times(D.power2().diagonal(false)).times(B.transpose());
+        Matrix C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
+
         int eigeneval = 0;
         double chiN = Math.pow(N, 0.5)*(1-1/(4*N) + 1/(21*Math.pow(N,2)));
 
-        while (evals < evaluations_limit_) {
+        int generations = 0;
+        while (evals < evaluations_limit_/*generations <1*/) {
+          generations += 1;
           //here we actually start..
           ArrayList<CandidateSolution> population = new ArrayList<CandidateSolution>();
           for(int i=0; i<lambda; i++){
             CandidateSolution child = new CandidateSolution(rnd_);
-            double[] randn = new double[N];
+            double[][] _tmp = new double[N][1];
             for(int j=0; j<N; j++){
-              randn[j] = rnd_.nextGaussian();
+              _tmp[j][0] = rnd_.nextGaussian() * D.get(j, 0);
             }
-            double[] new_genome = vector_plus_vector(xmean, x_times_vector(sigma, matrix_times_vector(B, vector_times_vector(D, randn))));
+            Matrix tmp = new Matrix(_tmp);
+
+            Matrix new_x = xmean.plus(B.times(sigma).times(tmp));
+            double[] new_genome = new double[N];
+            for(int j=0; j<N; j++){
+              new_genome[j] = new_x.get(j, 0);
+            }
             child.genotype = new_genome;
             child.fitness = (double)evaluation_.evaluate(child.genotype);
             evals += 1;
             population.add(child);
           }
           Collections.sort(population);
-          System.out.println(population.get(0).fitness);
 
-          double[] xold = xmean;
-
-          for(int i=0; i<xmean.length; i++){
-            xmean[i] = 0;
-          }
-
-          for(int i=0; i<mu; i++){
-            for(int j=0; j<N; j++){
-              xmean[j] = xmean[j] + weigths[i] * population.get(i).genotype[j];
+          Matrix xold = xmean.copy();
+          for(int i=0; i<N; i++){
+            double result = 0;
+            for(int j=0 ;j<mu; j++){
+              result += population.get(j).genotype[i] * weigths.get(j,0);
             }
+            xmean.set(i, 0,result);
           }
 
-          ps = vector_plus_vector(x_times_vector((1-cs), ps), x_times_vector(Math.sqrt(cs*(2-cs)*mu_eff)/sigma, matrix_times_vector(C_invsqrt, vector_minus_vector(xmean, xold))));
-          hsig = norm(ps)/Math.sqrt(1-Math.pow((1-cs),(2*evals/lambda)))/chiN < (1.4 + 2/(N+1));
-          pc = x_times_vector((1-cc), pc);
-          if(hsig){
-            pc = vector_plus_vector(pc, x_times_vector(Math.sqrt(cc*(2-cc)*mu_eff)/sigma, vector_minus_vector(xmean, xold)));
-          }
+          ps = ps.times((1-cs)).plus(C_invsqrt.times(xmean.minus(xold)).times(Math.sqrt(cs*(2-cs)*mu_eff)).times(1/sigma));
+          hsig = ps.norm()/Math.sqrt(1-Math.pow((1-cs),(2*evals/lambda)))/chiN < 1.4 + 2/(N+1);
+
+          pc = pc.times((1-cc));
+          if(hsig) pc = xmean.minus(xold).times(Math.sqrt(cc*(2-cc)*mu_eff)).times(1/sigma);
 
           double[][] tmp = new double[N][mu];
           for(int i=0; i<N; i++){
             for(int j=0; j<mu; j++){
-              tmp[i][j] = population.get(j).genotype[i] - xold[i];
+              tmp[i][j] = population.get(j).genotype[i] - xold.get(i,0);
             }
           }
-          tmp = x_times_matrix((1/sigma), tmp);
+          Matrix artmp = new Matrix(tmp);
+          artmp = artmp.times(1/sigma);
 
-          double[][] term1 =  x_times_matrix((1-c1-cmu), C);
-          double[][] pc_matrix = new double[N][N];
-          for(int i=0; i<N; i++){
-            for(int j=0; j<N; j++){
-              pc_matrix[i][j] = pc[i]*pc[j];
-            }
-          }
-          if(!hsig){
-            pc_matrix = matrix_plus_matrix(pc_matrix, x_times_matrix((cc*(2-cc)), C));
-          }
-          double[][] term2 = x_times_matrix(c1, pc_matrix);
-          double[][] term3 = x_times_matrix(cmu, matrix_times_matrix(matrix_times_matrix(tmp, diagonal(weigths)), transpose(tmp)));
-          C = matrix_plus_matrix(matrix_plus_matrix(term1, term2), term3);
+          Matrix oldC = C;
+          C = oldC.times((1-c1-cmu)).plus(pc.times(pc.transpose()).times(c1)).plus(artmp.times(weigths.diagonal(false)).times(artmp.transpose()).times(cmu));
+          if(!hsig) C = C.plus(oldC.times(c1*(cc*(2-cc))));
 
-          sigma = sigma * Math.exp((cs/damps)*(norm(ps)/chiN -1));
-
+          sigma = sigma * Math.exp((cs/damps)*(ps.norm()/chiN -1));
           if(evals - eigeneval > lambda/(c1+cmu)/N/10){
-            eigeneval = evals;
-            double[][] C_trans = transpose(C);
-            for(int i=0; i<C.length; i++){
-              for(int j=0; j<C[0].length; j++){
-                if(j < i){
-                  C[i][j] = C_trans[i][j];
-                }
-              }
-            }
-
+            // eigeneval = evals;
+            // C = C.triu(0).plus(C.triu(1).transpose());
+            // EigenvalueDecomposition ED = C.eig();
+            // B = ED.getV();
+            // D = ED.getD().diagonal(true).sqrt();
+            // C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
           }
-
         }
     }
 }
