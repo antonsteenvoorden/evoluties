@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-javac -cp contest.jar player45.java Population.java CandidateSolution.java
+javac -cp contest.jar player45.java CandidateSolution.java
 jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class
 
 if [ "$1" = "Bent" ]; then

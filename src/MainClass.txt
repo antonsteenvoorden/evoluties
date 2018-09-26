@@ -1,1 +1,1 @@
-Main-Class: player45 Population CandidateSolution
+Main-Class: player45
