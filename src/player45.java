@@ -42,6 +42,10 @@ public class player45 implements ContestSubmission {
         } else {
             // Do sth else
         }
+
+        //Bent-Cigar:
+        //Schaffers: Regular, Multi
+        //Katsuura: Multi
     }
 
     private  double getRandomNumberInRange(int min, int max) {
