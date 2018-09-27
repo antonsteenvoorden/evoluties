@@ -5,23 +5,55 @@ javac -cp contest.jar player45.java Population.java CandidateSolution.java
 jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class
 
 if [ "$1" = "Bent" ]; then
-    echo "\nBent Cigar"
-    java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=1
+    echo "Bent Cigar"
+    total_score=0.0
+    for i in {1..5}
+    do
+      var="$(java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
+      vars=( $var )
+      total_score=`echo $total_score + ${vars[1]} | bc`
+    done
+    total_score=`echo $total_score / $i | bc -l`
+    echo $total_score
 fi
 
 if [ "$1" = "Sphere" ]; then
-    echo '\nSphere'
-    java -jar testrun.jar -submission=player45 -evaluation=SphereEvaluation -seed=1
+  echo "Sphere"
+  total_score=0.0
+  for i in {1..5}
+  do
+    var="$(java -jar testrun.jar -submission=player45 -evaluation=SphereEvaluation -seed=$i)"
+    vars=( $var )
+    total_score=`echo $total_score + ${vars[1]} | bc`
+  done
+  total_score=`echo $total_score / $i | bc -l`
+  echo $total_score
 fi
 
 if [ "$1" = "Schaffers" ]; then
-    echo '\nSchaffers'
-    java -jar testrun.jar -submission=player45 -evaluation=SchaffersEvaluation -seed=1
+  echo "Schaffers"
+  total_score=0.0
+  for i in {1..5}
+  do
+    var="$(java -jar testrun.jar -submission=player45 -evaluation=SchaffersEvaluation -seed=$i)"
+    vars=( $var )
+    total_score=`echo $total_score + ${vars[1]} | bc`
+  done
+  total_score=`echo $total_score / $i | bc -l`
+  echo $total_score
 fi
 
 if [ "$1" = 'Katsuura' ]; then
-    echo '\nKatsuura (run time > 10s, wait)'
-    java -jar testrun.jar -submission=player45 -evaluation=KatsuuraEvaluation -seed=1
+  echo "Katsuura"
+  total_score=0.0
+  for i in {1..5}
+  do
+    var="$(java -jar testrun.jar -submission=player45 -evaluation=KatsuuraEvaluation -seed=$i)"
+    vars=( $var )
+    total_score=`echo $total_score + ${vars[1]} | bc`
+  done
+  total_score=`echo $total_score / $i | bc -l`
+  echo $total_score
 fi
 
 # There are some security restrictions due to the online contest.
