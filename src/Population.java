@@ -116,8 +116,8 @@ public class Population {
     public CandidateSolution[] generateChildren (CandidateSolution[] parents) {
         if(this.recombinationOperator == RecombinationOperator.ONE_POINT_CROSS_OVER) {
           return onePointCrossOver(parents);
-        } else if(this.recombinationOperator == RecombinationOperator.NC2R) {
-
+        } else if(this.recombinationOperator == RecombinationOperator.NR2C) {
+          return NR2C(parents);
         } else if(this.recombinationOperator == RecombinationOperator.BAG_OF_GENES) {
 
         } else if(this.recombinationOperator == RecombinationOperator.DIAGONAL) {
@@ -137,7 +137,7 @@ public class Population {
       return children;
     }
 
-    public ArrayList<CandidateSolution> NR2C(ArrayList<CandidateSolution> parents) {
+    public CandidateSolution[] NR2C(CandidateSolution[] parents) {
       int numberOfGenes = 10;
       int NOC = 0;
 
