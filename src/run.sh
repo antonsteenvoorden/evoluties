@@ -9,8 +9,8 @@ if [ "$1" = "Bent" ]; then
     for i in {1..5}
     do
       var="$(java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
-      vars=( $var )
-      total_score=`echo $total_score + ${vars[1]} | bc`
+      vars=( ${var} )
+      total_score=`echo ${total_score} + ${vars[1]} | bc`
     done
     total_score=`echo $total_score / $i | bc -l`
     echo $total_score
