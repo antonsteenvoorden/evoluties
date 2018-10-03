@@ -17,11 +17,14 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
         this.fitness = Double.MIN_VALUE;
         this.random = random;
         this.mutationChance = mutationChance;
-        if(this.mutationChance == 0 ) {
-            this.mutationChance = 0.2;
+        if(this.mutationChance == -1 ) {
+            this.mutationChance = 0.2; //default
         }
         // doe random shit met range
         this.gaussianStandardDeviation = gaussianStandardDeviation;
+        if(this.gaussianStandardDeviation == -1 ) {
+          this.gaussianStandardDeviation = 0.1; //default
+        }
         init();
     }
 
