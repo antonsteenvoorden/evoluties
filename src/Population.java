@@ -139,8 +139,20 @@ public class Population {
 
     public CandidateSolution[] NR2C(CandidateSolution[] parents) {
       int numberOfGenes = 10;
-      int NOC = 0;
 
+      for(int i = 0; i < parents.length; i++) {
+        int PCI = 0;
+        CandidateSolution tmpChild = new CandidateSolution(this.random, -1, -1);
+        while (PCI < numberOfGenes) {
+          int CTI = randInt(PCI, numberOfGenes-1);
+          int randomParent = randInt(0, parents.length-1);
+          CandidateSolution parent = parents[randomParent];
+          for(int j = PCI; PCI < CTI; j++) {
+            tmpChild.genotype[j] = parent.genotype[j];
+          }
+          PCI = CTI;
+        }
+      }
       return parents;
     }
 
