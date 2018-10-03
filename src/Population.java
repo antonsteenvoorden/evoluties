@@ -18,6 +18,7 @@ public class Population {
     // enums
     ParentSelection parentSelectionMethod;
     SurvivorSelection survivorSelectionMethod;
+    RecombinationOperator recombinationOperator;
 
     Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
@@ -29,8 +30,11 @@ public class Population {
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
+
+        // TODO: this needs to be dynamic
         this.parentSelectionMethod = ParentSelection.RANDOM;
         this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
+        this.recombinationOperator = RecombinationOperator.ONE_POINT_CROSS_OVER;
 
         init();
     }
@@ -110,12 +114,46 @@ public class Population {
 
     //crossover
     public CandidateSolution[] generateChildren (CandidateSolution[] parents) {
-        CandidateSolution firstChild = crossOver(parents[0], parents[1]);
-        CandidateSolution secondChild = crossOver(parents[1], parents[0]);
-        firstChild.mutate();
-        secondChild.mutate();
-        CandidateSolution[] children = new CandidateSolution[]{firstChild, secondChild};
-        return children;
+        if(this.recombinationOperator == RecombinationOperator.ONE_POINT_CROSS_OVER) {
+          return onePointCrossOver(parents);
+        } else if(this.recombinationOperator == RecombinationOperator.NR2C) {
+          return NR2C(parents);
+        } else if(this.recombinationOperator == RecombinationOperator.BAG_OF_GENES) {
+
+        } else if(this.recombinationOperator == RecombinationOperator.DIAGONAL) {
+
+        }
+        // default is one point crossover
+        return onePointCrossOver(parents);
+
+    }
+
+    public CandidateSolution[] onePointCrossOver (CandidateSolution[] parents) {
+      CandidateSolution firstChild = crossOver(parents[0], parents[1]);
+      CandidateSolution secondChild = crossOver(parents[1], parents[0]);
+      firstChild.mutate();
+      secondChild.mutate();
+      CandidateSolution[] children = new CandidateSolution[]{firstChild, secondChild};
+      return children;
+    }
+
+    public CandidateSolution[] NR2C(CandidateSolution[] parents) {
+      int numberOfGenes = 10;
+
+      for(int i = 0; i < parents.length; i++) {
+        int PCI = 0;
+        CandidateSolution tmpChild = new CandidateSolution(this.random, -1, -1);
+        while (PCI < numberOfGenes) {
+          int CTI = randInt(PCI, numberOfGenes-1);
+          int randomParent = randInt(0, parents.length-1);
+          CandidateSolution parent = parents[randomParent];
+          for(int j = PCI; PCI < CTI; j++) {
+            tmpChild.genotype[j] = parent.genotype[j];
+          }
+          PCI = CTI;
+        }
+      }
+      return parents;
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
