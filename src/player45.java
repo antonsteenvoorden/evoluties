@@ -42,17 +42,33 @@ public class player45 implements ContestSubmission {
 
     public void run() {
         // Run your algorithm here
+
+        double bash_input[] = new double[4];
+        try { bash_input[0] = Double.parseDouble(System.getProperty("pop_size")); } catch (NullPointerException e){ bash_input[0] = 100; }
+        try { bash_input[1] = Double.parseDouble(System.getProperty("n_par")); } catch (NullPointerException e) { bash_input[1] = 5; }
+        try { bash_input[2] = Double.parseDouble(System.getProperty("m_chance")); } catch (NullPointerException e) { bash_input[2] = 0.1; }
+        try { bash_input[3] = Double.parseDouble(System.getProperty("gs_dev")); } catch (NullPointerException e) { bash_input[3] = 1; }
+
+        System.out.println("Input parameters:");
+        int i;
+        for (i=0; i < bash_input.length; i++) {
+            System.out.println(bash_input[i]);
+        }
+        System.out.println();
+
+        final int populationSize = (int)bash_input[0];
+        final int numberOfParentsSelections = (int)bash_input[1];
+
+        final double mutationChance = bash_input[2];
+        final double gaussianStandardDeviation = bash_input[3];
         final int min = -5;
         final int max = 5;
-        final int populationSize = 100;
-        final int numberOfParentsSelections = 50;
 
         int evals = 0;
         int generation = 0;
 
         // init population
-        // we should probably allow these variables to be set from the command line
-        Population population = new Population(populationSize, numberOfParentsSelections, evaluation_, rnd_);
+        Population population = new Population(populationSize, numberOfParentsSelections, mutationChance, gaussianStandardDeviation, evaluation_, rnd_);
         evals += populationSize;
         // calculate fitness
         while (evals < evaluations_limit_) {

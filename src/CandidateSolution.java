@@ -6,14 +6,14 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     double[] phenotype;
     double fitness;
     double mutationChance;
+    double gaussianStandardDeviation;
     Random random;
     private static int minAllele = -5;
     private static int maxAllele = 5;
-    private double stepSize = 0.1; // maybe evolve this as well later
 
-    public CandidateSolution(Random random, double mutationChance) {
+
+    public CandidateSolution(Random random, double mutationChance, double gaussianStandardDeviation) {
         this.genotype = new double[10];
-        this.phenotype = genotype; // zoiets
         this.fitness = Double.MIN_VALUE;
         this.random = random;
         this.mutationChance = mutationChance;
@@ -21,6 +21,7 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
             this.mutationChance = 0.2;
         }
         // doe random shit met range
+        this.gaussianStandardDeviation = gaussianStandardDeviation;
         init();
     }
 
@@ -41,13 +42,12 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
         }
         return 0;
     }
-    public double[] getHead(){
-      int cutOff = genotype.length/2;
+
+    public double[] getHead(int cutOff){
       return Arrays.copyOfRange(this.genotype, 0, cutOff);
     }
 
-    public double[] getTail(){
-      int cutOff = genotype.length/2;
+    public double[] getTail(int cutOff){
       return Arrays.copyOfRange(this.genotype, cutOff, genotype.length);
     }
 
@@ -80,7 +80,7 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     public void mutate() {
       for(int i=0; i<genotype.length; i++){
         if(this.random.nextDouble() < this.mutationChance){
-          genotype[i] += this.random.nextGaussian() * this.stepSize; //step size
+          genotype[i] += this.random.nextGaussian() * this.gaussianStandardDeviation;
         }
       }
     }

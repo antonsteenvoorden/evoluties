@@ -9,21 +9,23 @@ public class Population {
     ContestEvaluation evaluation;
     int populationSize;
     int numberOfParentsSelections;
+    double mutationChance;
+    double gaussianStandardDeviation;
     double bestFitness;
     CandidateSolution bestCandidate;
     Random random;
-    double mutationChance;
 
     // enums
     ParentSelection parentSelectionMethod;
     SurvivorSelection survivorSelectionMethod;
 
-    Population(int populationSize, int numberOfParentsSelections, ContestEvaluation evaluation, Random random){
+    Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
         this.populationSize = populationSize;
-        this.mutationChance = 1/populationSize;
         this.numberOfParentsSelections = numberOfParentsSelections;
+        this.mutationChance = mutationChance;
+        this.gaussianStandardDeviation = gaussianStandardDeviation;
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
@@ -35,7 +37,7 @@ public class Population {
 
     public void init (){
         for (int p = 0; p < this.populationSize; p++) {
-            CandidateSolution tmpSolution = new CandidateSolution(this.random, this.mutationChance);
+            CandidateSolution tmpSolution = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
             this.population.add(tmpSolution);
         }
         evaluateChildren(this.population);
@@ -61,14 +63,11 @@ public class Population {
     // make children
     // select best 100 as survivors
     public void createNewGeneration(){
-      CandidateSolution[] new_children = new CandidateSolution[this.numberOfParentsSelections*2];
         ArrayList<CandidateSolution> newChildren = new ArrayList<>();
 
         for(int i=0; i< this.numberOfParentsSelections; i++){
           CandidateSolution[] parents = parentSelection(this.parentSelectionMethod);
           CandidateSolution[] children = generateChildren(parents);
-          new_children[(i*2)] = children[0];
-          new_children[(i*2)+1] = children[1];
           newChildren.add(children[0]);
           newChildren.add(children[1]);
       }
@@ -121,8 +120,9 @@ public class Population {
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
-      CandidateSolution child = new CandidateSolution(this.random, this.mutationChance);
-      child.setGenotype(concatenateArrays(c1.getHead(), c2.getTail()));
+      CandidateSolution child = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
+      int cutOff = randInt(0, 10);
+      child.setGenotype(concatenateArrays(c1.getHead(cutOff), c2.getTail(cutOff)));
       return child;
     }
 
@@ -154,6 +154,10 @@ public class Population {
             offset += array.length;
         }
         return result;
+    }
+
+    public int randInt(int min, int max) {
+      return this.random.nextInt((max - min) + 1) + min;
     }
 
 
