@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class player45 implements ContestSubmission {
+public class testplayer implements ContestSubmission {
     Random rnd_;
     ContestEvaluation evaluation_;
     private int evaluations_limit_;
 
-    public player45() {
+    public testplayer() {
         rnd_ = new Random();
     }
 
@@ -61,6 +61,7 @@ public class player45 implements ContestSubmission {
 
     public void run() {
         // Run your algorithm here
+
         Maths matrixMath = new Maths();
 
         int evals = 0;
@@ -72,10 +73,14 @@ public class player45 implements ContestSubmission {
           _xmean[i][0] = getRandomNumberInRange(-5, 5);
         }
         Matrix xmean = new Matrix(_xmean);
-        double sigma = 4;
-        int lambda = 4+(int)Math.floor(3*Math.log(N));
-        lambda = 100;
-        int mu = (int)Math.floor(lambda/2);
+        // double sigma = 4;
+        // int lambda = 4+(int)Math.floor(3*Math.log(N));
+        // lambda = 100;
+        // int mu = (int)Math.floor(lambda/2);
+
+        int lambda = Integer.parseInt(System.getProperty("lambda"));
+        int mu = Integer.parseInt(System.getProperty("mu"));
+        double sigma = Double.parseDouble(System.getProperty("sigma"));
 
         double[][] _weigths = new double[mu][1];
         for(int i=0; i<mu; i++){
@@ -106,7 +111,7 @@ public class player45 implements ContestSubmission {
         double chiN = Math.pow(N, 0.5)*(1-1/(4*N) + 1/(21*Math.pow(N,2)));
 
         int generations = 0;
-        while (evals < evaluations_limit_/*generations <1*/) {
+        while (evals < (10000-lambda)) {
           generations += 1;
           //here we actually start..
           ArrayList<CandidateSolution> population = new ArrayList<CandidateSolution>();
