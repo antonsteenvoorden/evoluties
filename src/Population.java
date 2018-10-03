@@ -70,6 +70,13 @@ public class Population {
       }
       evaluateChildren(new_children);
       survivorSelection(new_children);
+      printPopulation();
+    }
+
+    public void printPopulation() {
+      for(CandidateSolution sol: population){
+        sol.printSolution();
+      }
     }
 
     //best 2 out for random 5
