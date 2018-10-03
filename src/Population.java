@@ -42,7 +42,6 @@ public class Population {
         }
         evaluateChildren(this.population);
         Collections.sort(this.population);
-        System.out.println("populationSize "+ this.population.size());
     }
 
     // evaluates all our candidate solutions
