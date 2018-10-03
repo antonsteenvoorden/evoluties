@@ -1,5 +1,4 @@
 import java.util.Random;
-import java.util.Properties;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -16,6 +15,10 @@ public class Population {
     CandidateSolution bestCandidate;
     Random random;
 
+    // enums
+    ParentSelection parentSelectionMethod;
+    SurvivorSelection survivorSelectionMethod;
+
     Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
@@ -26,6 +29,9 @@ public class Population {
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
+        this.parentSelectionMethod = ParentSelection.RANDOM;
+        this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
+
         init();
     }
 
@@ -34,22 +40,15 @@ public class Population {
             CandidateSolution tmpSolution = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
             this.population.add(tmpSolution);
         }
-        evalutePopulation();
+        evaluateChildren(this.population);
         Collections.sort(this.population);
+        System.out.println("populationSize "+ this.population.size());
     }
 
-    public void evalutePopulation(){
-      for(CandidateSolution sol : this.population){
-        double fitness = (double)this.evaluation.evaluate(sol.getGenotype());
-        if(fitness > this.bestFitness){
-          this.bestFitness = fitness;
-          this.bestCandidate = sol;
-        }
-        sol.setFitness(fitness);
-      }
-    }
-
-    public void evaluateChildren(CandidateSolution[] children){
+    // evaluates all our candidate solutions
+    // assigns a fitness to each
+    // keeps track of our best performing solution
+    public void evaluateChildren(ArrayList<CandidateSolution> children){
       for(CandidateSolution sol : children){
         double fitness = (double)this.evaluation.evaluate(sol.getGenotype());
         if(fitness > this.bestFitness){
@@ -60,23 +59,39 @@ public class Population {
       }
     }
 
-    public void generation(){
-      CandidateSolution[] new_children = new CandidateSolution[numberOfParentsSelections*2];
-      for(int i=0; i<numberOfParentsSelections; i++){
-        CandidateSolution[] parents = parentSelection();
-        CandidateSolution[] children = generateChildren(parents);
-        new_children[(i*2)] = children[0];
-        new_children[(i*2)+1] = children[1];
+    // select parents
+    // make children
+    // select best 100 as survivors
+    public void createNewGeneration(){
+        ArrayList<CandidateSolution> newChildren = new ArrayList<>();
+
+        for(int i=0; i< this.numberOfParentsSelections; i++){
+          CandidateSolution[] parents = parentSelection(this.parentSelectionMethod);
+          CandidateSolution[] children = generateChildren(parents);
+          newChildren.add(children[0]);
+          newChildren.add(children[1]);
       }
-      evaluateChildren(new_children);
-      survivorSelection(new_children);
+      evaluateChildren(newChildren);
+
+      if(this.survivorSelectionMethod != SurvivorSelection.REMOVE_WORST) {
+        ArrayList<CandidateSolution> tmpSolutions = new ArrayList<>(this.population);
+        tmpSolutions.addAll(newChildren);
+        newChildren = tmpSolutions;
+      }
+      survivorSelection(newChildren);
     }
 
+    public CandidateSolution[] parentSelection(ParentSelection parentSelection) {
+        if(parentSelection == ParentSelection.RANDOM) {
+            return randomParentSelection();
+        }
+        return new CandidateSolution[]{};
+    }
     //best 2 out for random 5
-    public CandidateSolution[] parentSelection () {
+    public CandidateSolution[] randomParentSelection() {
       CandidateSolution[] randomFive = new CandidateSolution[5];
       for(int i=0; i<5; i++){
-        randomFive[i] = this.population.get(this.random.nextInt(this.populationSize));
+        randomFive[i] = this.population.get(this.random.nextInt(this.population.size()));
       }
 
       CandidateSolution best = randomFive[0];
@@ -112,11 +127,17 @@ public class Population {
     }
 
     // remove the worst!
-    public void survivorSelection (CandidateSolution[] children) {
-      this.population.subList(this.population.size() - this.numberOfParentsSelections*2, this.population.size()).clear();
-      for(CandidateSolution sol: children){
-        this.population.add(sol);
-      }
+    public void survivorSelection (ArrayList<CandidateSolution> solutions) {
+        // ff geen switch
+        if(this.survivorSelectionMethod == SurvivorSelection.REMOVE_WORST){
+            this.population.subList(this.population.size() - this.numberOfParentsSelections*2, this.population.size()).clear();
+            for(CandidateSolution sol: solutions){
+                this.population.add(sol);
+            }
+        } else if(this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
+            // pick 2 at random, add the one with the highest fitness to the population.
+        }
+
       Collections.sort(this.population);
     }
 
@@ -138,10 +159,6 @@ public class Population {
     public int randInt(int min, int max) {
       return this.random.nextInt((max - min) + 1) + min;
     }
-
-
-
-
 
 
 }

@@ -1,8 +1,7 @@
-
 #!/usr/bin/env bash
 
-javac -cp contest.jar player45.java Population.java CandidateSolution.java
-jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class
+javac -cp contest.jar player45.java Population.java CandidateSolution.java ParentSelection.java SurvivorSelection.java
+jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class ParentSelection.class SurvivorSelection.class
 echo 'Running all evaluations..'
 
 
@@ -23,7 +22,7 @@ echo 'Sphere'
 total_score_Sphere=0.0
 for i in {1..30}
 do
-  var="$(java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
+  var="$(java -jar testrun.jar -submission=player45 -evaluation=SphereEvaluation -seed=$i)"
   vars=( $var )
   total_score_Sphere=`echo ${total_score_Sphere} + ${vars[1]} | bc`
 #  echo "${vars[1]}"
@@ -36,7 +35,7 @@ echo 'Schaffers'
 total_score_Schaffers=0.0
 for i in {1..30}
 do
-  var="$(java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
+  var="$(java -jar testrun.jar -submission=player45 -evaluation=SchaffersEvaluation -seed=$i)"
   vars=( $var )
   total_score_Schaffers=`echo ${total_score_Schaffers} + ${vars[1]} | bc`
 #  echo "${vars[1]}"
@@ -49,7 +48,7 @@ echo 'Katsuura (run time > 30*10s = 5min, wait)'
 total_score_Katsuura=0.0
 for i in {1..30}
 do
-  var="$(java -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
+  var="$(java -jar testrun.jar -submission=player45 -evaluation=KatsuuraEvaluation -seed=$i)"
   vars=( $var )
   total_score_Katsuura=`echo ${total_score_Katsuura} + ${vars[1]} | bc`
 #  echo "${vars[1]}"
