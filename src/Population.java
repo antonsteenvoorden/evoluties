@@ -1,5 +1,4 @@
 import java.util.Random;
-import java.util.Properties;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -16,6 +15,11 @@ public class Population {
     CandidateSolution bestCandidate;
     Random random;
 
+    // enums
+    ParentSelection parentSelectionMethod;
+    SurvivorSelection survivorSelectionMethod;
+    RecombinationOperator recombinationOperator;
+
     Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
@@ -26,6 +30,12 @@ public class Population {
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
+
+        // TODO: this needs to be dynamic
+        this.parentSelectionMethod = ParentSelection.RANDOM;
+        this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
+        this.recombinationOperator = RecombinationOperator.ONE_POINT_CROSS_OVER;
+
         init();
     }
 
@@ -34,22 +44,14 @@ public class Population {
             CandidateSolution tmpSolution = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
             this.population.add(tmpSolution);
         }
-        evalutePopulation();
+        evaluateChildren(this.population);
         Collections.sort(this.population);
     }
 
-    public void evalutePopulation(){
-      for(CandidateSolution sol : this.population){
-        double fitness = (double)this.evaluation.evaluate(sol.getGenotype());
-        if(fitness > this.bestFitness){
-          this.bestFitness = fitness;
-          this.bestCandidate = sol;
-        }
-        sol.setFitness(fitness);
-      }
-    }
-
-    public void evaluateChildren(CandidateSolution[] children){
+    // evaluates all our candidate solutions
+    // assigns a fitness to each
+    // keeps track of our best performing solution
+    public void evaluateChildren(ArrayList<CandidateSolution> children){
       for(CandidateSolution sol : children){
         double fitness = (double)this.evaluation.evaluate(sol.getGenotype());
         if(fitness > this.bestFitness){
@@ -60,13 +62,24 @@ public class Population {
       }
     }
 
-    public void generation(){
-      CandidateSolution[] new_children = new CandidateSolution[numberOfParentsSelections*2];
-      for(int i=0; i<numberOfParentsSelections; i++){
-        CandidateSolution[] parents = parentSelection();
-        CandidateSolution[] children = generateChildren(parents);
-        new_children[(i*2)] = children[0];
-        new_children[(i*2)+1] = children[1];
+    // select parents
+    // make children
+    // select best 100 as survivors
+    public void createNewGeneration(){
+        ArrayList<CandidateSolution> newChildren = new ArrayList<>();
+
+        for(int i=0; i< this.numberOfParentsSelections; i++){
+          CandidateSolution[] parents = parentSelection(this.parentSelectionMethod);
+          CandidateSolution[] children = generateChildren(parents);
+          newChildren.add(children[0]);
+          newChildren.add(children[1]);
+      }
+      evaluateChildren(newChildren);
+
+      if(this.survivorSelectionMethod != SurvivorSelection.REMOVE_WORST) {
+        ArrayList<CandidateSolution> tmpSolutions = new ArrayList<>(this.population);
+        tmpSolutions.addAll(newChildren);
+        newChildren = tmpSolutions;
       }
       evaluateChildren(new_children);
       survivorSelection(new_children);
@@ -77,13 +90,20 @@ public class Population {
       for(CandidateSolution sol: population){
         sol.printSolution();
       }
+
     }
 
+    public CandidateSolution[] parentSelection(ParentSelection parentSelection) {
+        if(parentSelection == ParentSelection.RANDOM) {
+            return randomParentSelection();
+        }
+        return new CandidateSolution[]{};
+    }
     //best 2 out for random 5
-    public CandidateSolution[] parentSelection () {
+    public CandidateSolution[] randomParentSelection() {
       CandidateSolution[] randomFive = new CandidateSolution[5];
       for(int i=0; i<5; i++){
-        randomFive[i] = this.population.get(this.random.nextInt(this.populationSize));
+        randomFive[i] = this.population.get(this.random.nextInt(this.population.size()));
       }
 
       CandidateSolution best = randomFive[0];
@@ -103,12 +123,46 @@ public class Population {
 
     //crossover
     public CandidateSolution[] generateChildren (CandidateSolution[] parents) {
-        CandidateSolution firstChild = crossOver(parents[0], parents[1]);
-        CandidateSolution secondChild = crossOver(parents[1], parents[0]);
-        firstChild.mutate();
-        secondChild.mutate();
-        CandidateSolution[] children = new CandidateSolution[]{firstChild, secondChild};
-        return children;
+        if(this.recombinationOperator == RecombinationOperator.ONE_POINT_CROSS_OVER) {
+          return onePointCrossOver(parents);
+        } else if(this.recombinationOperator == RecombinationOperator.NR2C) {
+          return NR2C(parents);
+        } else if(this.recombinationOperator == RecombinationOperator.BAG_OF_GENES) {
+
+        } else if(this.recombinationOperator == RecombinationOperator.DIAGONAL) {
+
+        }
+        // default is one point crossover
+        return onePointCrossOver(parents);
+
+    }
+
+    public CandidateSolution[] onePointCrossOver (CandidateSolution[] parents) {
+      CandidateSolution firstChild = crossOver(parents[0], parents[1]);
+      CandidateSolution secondChild = crossOver(parents[1], parents[0]);
+      firstChild.mutate();
+      secondChild.mutate();
+      CandidateSolution[] children = new CandidateSolution[]{firstChild, secondChild};
+      return children;
+    }
+
+    public CandidateSolution[] NR2C(CandidateSolution[] parents) {
+      int numberOfGenes = 10;
+
+      for(int i = 0; i < parents.length; i++) {
+        int PCI = 0;
+        CandidateSolution tmpChild = new CandidateSolution(this.random, -1, -1);
+        while (PCI < numberOfGenes) {
+          int CTI = randInt(PCI, numberOfGenes-1);
+          int randomParent = randInt(0, parents.length-1);
+          CandidateSolution parent = parents[randomParent];
+          for(int j = PCI; PCI < CTI; j++) {
+            tmpChild.genotype[j] = parent.genotype[j];
+          }
+          PCI = CTI;
+        }
+      }
+      return parents;
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
@@ -119,11 +173,17 @@ public class Population {
     }
 
     // remove the worst!
-    public void survivorSelection (CandidateSolution[] children) {
-      this.population.subList(this.population.size() - this.numberOfParentsSelections*2, this.population.size()).clear();
-      for(CandidateSolution sol: children){
-        this.population.add(sol);
-      }
+    public void survivorSelection (ArrayList<CandidateSolution> solutions) {
+        // ff geen switch
+        if(this.survivorSelectionMethod == SurvivorSelection.REMOVE_WORST){
+            this.population.subList(this.population.size() - this.numberOfParentsSelections*2, this.population.size()).clear();
+            for(CandidateSolution sol: solutions){
+                this.population.add(sol);
+            }
+        } else if(this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
+            // pick 2 at random, add the one with the highest fitness to the population.
+        }
+
       Collections.sort(this.population);
     }
 
@@ -145,10 +205,6 @@ public class Population {
     public int randInt(int min, int max) {
       return this.random.nextInt((max - min) + 1) + min;
     }
-
-
-
-
 
 
 }

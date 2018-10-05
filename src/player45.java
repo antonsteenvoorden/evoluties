@@ -3,7 +3,6 @@ import org.vu.contest.ContestEvaluation;
 
 import java.util.Random;
 import java.util.Properties;
-import java.util.Arrays;
 
 public class player45 implements ContestSubmission {
     Random rnd_;
@@ -56,6 +55,8 @@ public class player45 implements ContestSubmission {
 
         final double mutationChance = bash_input[2];
         final double gaussianStandardDeviation = bash_input[3];
+        final int min = -5;
+        final int max = 5;
 
         int evals = 0;
         int generation = 0;
@@ -65,7 +66,7 @@ public class player45 implements ContestSubmission {
         evals += populationSize;
         // calculate fitness
         while (evals < evaluations_limit_) {
-            population.generation();
+            population.createNewGeneration();
             generation++;
             evals += numberOfParentsSelections*2;
         }

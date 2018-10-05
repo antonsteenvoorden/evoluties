@@ -17,7 +17,14 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
         this.fitness = Double.MIN_VALUE;
         this.random = random;
         this.mutationChance = mutationChance;
+        if(this.mutationChance == -1 ) {
+            this.mutationChance = 0.2; //default
+        }
+        // doe random shit met range
         this.gaussianStandardDeviation = gaussianStandardDeviation;
+        if(this.gaussianStandardDeviation == -1 ) {
+          this.gaussianStandardDeviation = 0.1; //default
+        }
         init();
     }
 
@@ -36,6 +43,14 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
 
     public double[] getGenotype(){
       return this.genotype;
+    }
+    public double getGenomeAtIndex(int index) {
+        if(index < this.genotype.length -1) {
+            return this.genotype[index];
+        } else {
+            //ERROR
+        }
+        return 0;
     }
 
     public double[] getHead(int cutOff){
@@ -90,6 +105,7 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
       return result;
     }
 
+    // gets called by Collection sort
     public int compareTo(CandidateSolution sol1) {
       if(this.getFitness() > sol1.getFitness()){
         return -1;
