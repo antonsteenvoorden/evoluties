@@ -34,7 +34,7 @@ public class Population {
         // TODO: this needs to be dynamic
         this.parentSelectionMethod = ParentSelection.RANDOM;
         this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
-        this.recombinationOperator = RecombinationOperator.BAG_OF_GENES;
+        this.recombinationOperator = RecombinationOperator.onePointCrossOver;
 
         init();
     }
@@ -124,7 +124,7 @@ public class Population {
 
         }
         // default is one point crossover
-        return BAG_OF_GENES(parents);
+        return onePointCrossOver(parents);
 
     }
 
