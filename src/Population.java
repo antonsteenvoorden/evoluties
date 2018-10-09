@@ -34,7 +34,7 @@ public class Population {
         // TODO: this needs to be dynamic
         this.parentSelectionMethod = ParentSelection.RANDOM;
         this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
-        this.recombinationOperator = RecombinationOperator.onePointCrossOver;
+        this.recombinationOperator = RecombinationOperator.ONE_POINT_CROSS_OVER;
 
         init();
     }
