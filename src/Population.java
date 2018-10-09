@@ -34,7 +34,7 @@ public class Population {
         // TODO: this needs to be dynamic
         this.parentSelectionMethod = ParentSelection.RANDOM;
         this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
-        this.recombinationOperator = RecombinationOperator.ONE_POINT_CROSS_OVER;
+        this.recombinationOperator = RecombinationOperator.BAG_OF_GENES;
 
         init();
     }
@@ -119,12 +119,12 @@ public class Population {
         } else if(this.recombinationOperator == RecombinationOperator.NR2C) {
           return NR2C(parents);
         } else if(this.recombinationOperator == RecombinationOperator.BAG_OF_GENES) {
-
+          return BAG_OF_GENES(parents);
         } else if(this.recombinationOperator == RecombinationOperator.DIAGONAL) {
 
         }
         // default is one point crossover
-        return onePointCrossOver(parents);
+        return BAG_OF_GENES(parents);
 
     }
 
@@ -154,6 +154,38 @@ public class Population {
         }
       }
       return parents;
+    }
+    
+    public void shuffleArray(double[] ar){
+      Random rnd = this.random;
+      for (int i = ar.length - 1; i > 0; i--)
+      {
+        int index = rnd.nextInt(i + 1);
+        double a = ar[index];
+        ar[index] = ar[i];
+        ar[i] = a;
+      }
+    }
+
+    public CandidateSolution[] BAG_OF_GENES(CandidateSolution[] parents) {
+      int numberOfGenes = 10;
+      double[][] bags = new double[numberOfGenes][parents.length];
+      CandidateSolution[] children = new CandidateSolution[parents.length];
+      for (int g = 0; g<parents.length; g++){
+        children[g] = new CandidateSolution(this.random, -1,-1);
+      }
+      for (int i = 0; i<numberOfGenes; i++) {
+        double[] bag = new double[parents.length];
+        for (int j = 0; j< parents.length; j++) {
+          CandidateSolution parent = parents[j];
+          bag[j]= parent.genotype[i];
+        }
+        shuffleArray(bag);
+        for (int k = 0; k < parents.length; k++) {
+          children[k].genotype[i] = bag[k];
+        }
+      }
+      return children;
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
