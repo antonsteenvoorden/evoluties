@@ -171,15 +171,18 @@ public class Population {
       int numberOfGenes = 10;
       double[][] bags = new double[numberOfGenes][parents.length];
       CandidateSolution[] children = new CandidateSolution[parents.length];
+      //make children
       for (int g = 0; g<parents.length; g++){
         children[g] = new CandidateSolution(this.random, -1,-1);
       }
+      //for each ith gene select all the parents, save the genes
       for (int i = 0; i<numberOfGenes; i++) {
         double[] bag = new double[parents.length];
         for (int j = 0; j< parents.length; j++) {
           CandidateSolution parent = parents[j];
           bag[j]= parent.genotype[i];
         }
+        //shuffle genes and put them back into the children
         shuffleArray(bag);
         for (int k = 0; k < parents.length; k++) {
           children[k].genotype[i] = bag[k];
