@@ -34,6 +34,13 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
         }
     }
 
+    public void printSolution(){
+        for(double allele: this.genotype){
+          System.out.printf("%.2f,", allele);
+        }
+        System.out.printf("%.2f\n", this.fitness);
+    }
+
     public double[] getGenotype(){
       return this.genotype;
     }

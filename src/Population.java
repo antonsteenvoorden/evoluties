@@ -81,7 +81,16 @@ public class Population {
         tmpSolutions.addAll(newChildren);
         newChildren = tmpSolutions;
       }
-      survivorSelection(newChildren);
+      evaluateChildren(new_children);
+      survivorSelection(new_children);
+      printPopulation();
+    }
+
+    public void printPopulation() {
+      for(CandidateSolution sol: population){
+        sol.printSolution();
+      }
+
     }
 
     public CandidateSolution[] parentSelection(ParentSelection parentSelection) {

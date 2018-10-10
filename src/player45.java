@@ -49,6 +49,7 @@ public class player45 implements ContestSubmission {
         try { bash_input[2] = Double.parseDouble(System.getProperty("m_chance")); } catch (NullPointerException e) { bash_input[2] = 0.1; }
         try { bash_input[3] = Double.parseDouble(System.getProperty("gs_dev")); } catch (NullPointerException e) { bash_input[3] = 1; }
 
+
         final int populationSize = (int)bash_input[0];
         final int numberOfParentsSelections = (int)bash_input[1];
 
