@@ -1,4 +1,5 @@
 public enum ParentSelection {
     RANDOM,
-    FITTEST_HIGHER_PROBABILITY
+    FITTEST_HIGHER_PROBABILITY,
+    TOURNAMENT
 }

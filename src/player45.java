@@ -45,13 +45,15 @@ public class player45 implements ContestSubmission {
 
         double bash_input[] = new double[4];
         try { bash_input[0] = Double.parseDouble(System.getProperty("pop_size")); } catch (NullPointerException e){ bash_input[0] = 100; }
-        try { bash_input[1] = Double.parseDouble(System.getProperty("n_par")); } catch (NullPointerException e) { bash_input[1] = 5; }
+        try { bash_input[1] = Double.parseDouble(System.getProperty("n_par")); } catch (NullPointerException e) { bash_input[1] = 20; }
         try { bash_input[2] = Double.parseDouble(System.getProperty("m_chance")); } catch (NullPointerException e) { bash_input[2] = 0.1; }
         try { bash_input[3] = Double.parseDouble(System.getProperty("gs_dev")); } catch (NullPointerException e) { bash_input[3] = 1; }
 
 
         final int populationSize = (int)bash_input[0];
         final int numberOfParents = (int)bash_input[1];
+
+        final int numberOfParentSelections = populationSize / numberOfParents;
 
         final double mutationChance = bash_input[2];
         final double gaussianStandardDeviation = bash_input[3];
@@ -66,17 +68,19 @@ public class player45 implements ContestSubmission {
         int printSplit = evaluations_limit_ / numberOfPrints;
 
         // init population
-        Population population = new Population(populationSize, numberOfParents, mutationChance, gaussianStandardDeviation, evaluation_, rnd_);
+        Population population = new Population(populationSize, numberOfParents, numberOfParentSelections, mutationChance, gaussianStandardDeviation, evaluation_, rnd_);
         evals += populationSize;
         // calculate fitness
-        while (evals < evaluations_limit_) {
+        while (evals < evaluations_limit_ - populationSize) {
+            System.out.println(evals);
             population.createNewGeneration();
+            // System.out.println()
             generation++;
-            evals += numberOfParents*2; //Check if this is still right with number of children.
-            currentEvals += numberOfParents*2;
+            evals += numberOfParents; //Check if this is still right with number of children.
+            currentEvals += numberOfParents;
             if(currentEvals >= printSplit){
               currentEvals = 0;
-              population.printPopulation();
+              // population.printPopulation();
             }
         }
     }

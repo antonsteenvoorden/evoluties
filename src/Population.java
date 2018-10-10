@@ -10,6 +10,8 @@ public class Population {
     ContestEvaluation evaluation;
     int populationSize;
     int numberOfParents;
+    int tournamentSize;
+    int numberOfParentSelections;
     double mutationChance;
     double gaussianStandardDeviation;
     double bestFitness;
@@ -21,21 +23,24 @@ public class Population {
     SurvivorSelection survivorSelectionMethod;
     RecombinationOperator recombinationOperator;
 
-    Population(int populationSize, int numberOfParents, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
+    Population(int populationSize, int numberOfParents, int numberOfParentSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
         this.populationSize = populationSize;
         this.numberOfParents = numberOfParents;
+        this.numberOfParentSelections = numberOfParentSelections;
         this.mutationChance = mutationChance;
         this.gaussianStandardDeviation = gaussianStandardDeviation;
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
 
+        this.tournamentSize = 4;
+
         // TODO: this needs to be dynamic
-        this.parentSelectionMethod = ParentSelection.RANDOM;
+        this.parentSelectionMethod = ParentSelection.TOURNAMENT;
         this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
-        this.recombinationOperator = RecombinationOperator.ONE_POINT_CROSS_OVER;
+        this.recombinationOperator = RecombinationOperator.NR2C;
 
         init();
     }
@@ -47,6 +52,12 @@ public class Population {
         }
         evaluateChildren(this.population);
         Collections.sort(this.population);
+    }
+
+    public void printPopulation() {
+      for(CandidateSolution sol: population){
+        sol.printSolution();
+      }
     }
 
     // evaluates all our candidate solutions
@@ -63,68 +74,70 @@ public class Population {
       }
     }
 
+    public void evaluateChild(CandidateSolution child){
+      double fitness = (double)this.evaluation.evaluate(child.getGenotype());
+      if(fitness > this.bestFitness){
+        this.bestFitness = fitness;
+        this.bestCandidate = child;
+      }
+      child.setFitness(fitness);
+    }
+
     // select parents
     // make children
     // select best 100 as survivors
     public void createNewGeneration(){
-        ArrayList<CandidateSolution> newChildren = new ArrayList<>();
-
-        for(int i=0; i< this.numberOfParents; i++){
-          CandidateSolution[] parents = parentSelection(this.parentSelectionMethod);
-          CandidateSolution[] children = generateChildren(parents);
-          newChildren.add(children[0]);
-          newChildren.add(children[1]);
+      ArrayList<CandidateSolution> newPopulation = new ArrayList<CandidateSolution>();
+      for(int i=0; i< this.numberOfParentSelections; i++){
+        CandidateSolution[] parents = parentSelection();
+        // System.out.println("Na parentSelection");
+        CandidateSolution[] children = generateChildren(parents);
+        // System.out.println("Na generateChildren");
+        for(CandidateSolution sol: children){
+          evaluateChild(sol);
+          newPopulation.add(sol);
+        }
       }
-      evaluateChildren(newChildren);
-
-      if(this.survivorSelectionMethod != SurvivorSelection.REMOVE_WORST) {
-        ArrayList<CandidateSolution> tmpSolutions = new ArrayList<>(this.population);
-        tmpSolutions.addAll(newChildren);
-        newChildren = tmpSolutions;
-      }
-      survivorSelection(newChildren);
+      this.population = newPopulation;
     }
 
-    public void printPopulation() {
-      for(CandidateSolution sol: population){
-        sol.printSolution();
-      }
 
-    }
-
-    public CandidateSolution[] parentSelection(ParentSelection parentSelection) {
-        if(parentSelection == ParentSelection.RANDOM) {
+    public CandidateSolution[] parentSelection() {
+        if(this.parentSelectionMethod == ParentSelection.RANDOM) {
             return randomParentSelection();
+        } else if(this.parentSelectionMethod == ParentSelection.TOURNAMENT){
+          return tournamentParentSelection();
         }
         return new CandidateSolution[]{};
     }
-    //best 2 out for random 5
+
     public CandidateSolution[] randomParentSelection() {
-      CandidateSolution[] randomFive = new CandidateSolution[5];
-      for(int i=0; i<5; i++){
-        randomFive[i] = this.population.get(this.random.nextInt(this.population.size()));
+      CandidateSolution[] parents = new CandidateSolution[this.numberOfParents];
+      for(int i=0; i<this.numberOfParents; i++){
+        parents[i] = this.population.get(randInt(0, this.populationSize-1));
       }
+      return parents;
+    }
 
-      CandidateSolution best = randomFive[0];
-      CandidateSolution secondBest = randomFive[0];
-      for(CandidateSolution sol : randomFive){
-        if(sol.getFitness() > best.getFitness()){
-          secondBest = best;
-          best = sol;
-        }else if(sol.getFitness() > secondBest.getFitness()){
-          secondBest = sol;
+    //best out of k random
+    public CandidateSolution[] tournamentParentSelection() {
+      CandidateSolution[] parents = new CandidateSolution[this.numberOfParents];
+      for(int i=0; i<this.numberOfParents; i++){
+        CandidateSolution winner = this.population.get(randInt(0, this.populationSize-1));
+        for(int j=0; j<this.tournamentSize-1; j++){
+          CandidateSolution challenger = this.population.get(randInt(0, this.populationSize-1));
+          if(challenger.fitness > winner.fitness){
+            winner = challenger;
+          }
         }
+        parents[i] = winner;
       }
-
-      CandidateSolution[] parents = new CandidateSolution[]{best, secondBest};
       return parents;
     }
 
     //crossover
     public CandidateSolution[] generateChildren (CandidateSolution[] parents) {
-        if(this.recombinationOperator == RecombinationOperator.ONE_POINT_CROSS_OVER) {
-            return onePointCrossOver(parents);
-        } else if(this.recombinationOperator == RecombinationOperator.NR2C) {
+        if(this.recombinationOperator == RecombinationOperator.NR2C) {
             return NR2C(parents);
         } else if(this.recombinationOperator == RecombinationOperator.BAG_OF_GENES) {
             return bagOfGenes(parents);
@@ -132,8 +145,7 @@ public class Population {
             return diagonal(parents);
         }
         // default is one point crossover
-        return onePointCrossOver(parents);
-
+        return diagonal(parents);
     }
 
     public CandidateSolution[] onePointCrossOver (CandidateSolution[] parents) {
@@ -165,7 +177,7 @@ public class Population {
           for(int j = PCI; j < CTI; j++) {
             tmpChild.genotype[j] = parent.genotype[j];
           }
-          PCI = CI;
+          PCI = CTI;
         }
         children[i] = tmpChild;
       }
@@ -208,6 +220,7 @@ public class Population {
     }
 
     public CandidateSolution[] diagonal(CandidateSolution[] parents) {
+        // System.out.println("Begin diagonal");
         int numberOfGenes = 10;
         ArrayList<Integer> CIs = new ArrayList<Integer>();
         ArrayList<Integer> PIs = new ArrayList<Integer>();
@@ -217,8 +230,8 @@ public class Population {
         // produce empty children, random cutoff indices and parent indices.
         ArrayList<CandidateSolution> children = new ArrayList<CandidateSolution>();
         for (int i = 0; i < parents.length; i++) {
-            while (PCI < numberOfGenes) {
-                CIs.add(randInt(PCI, numberOfGenes-1));
+            while (PCI < numberOfGenes-1) {
+                CIs.add(randInt(PCI+1, numberOfGenes-1));
                 PCI = CIs.get(CIs.size()-1);
                 PIs.add(randInt(0, parents.length-1));
                 children.add(new CandidateSolution(this.random, -1, -1));
@@ -228,6 +241,7 @@ public class Population {
             break;
         }
 
+        // System.out.println("begin diagonal crossover");
         // Do the diagonal crossover
         for (int child = 0; child < children.size(); child++) {
             for (int index = 0; index < PIs.size(); index++) {  // PIs en CIs is same size
@@ -244,6 +258,7 @@ public class Population {
         // Get to result format of other methods
         CandidateSolution[] final_children = new CandidateSolution[children.size()];
         for (int l = 0; l < final_children.length; l++) final_children[l] = children.get(l);
+        return final_children;
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
