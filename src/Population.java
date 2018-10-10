@@ -148,6 +148,7 @@ public class Population {
 
     public CandidateSolution[] NR2C(CandidateSolution[] parents) {
       int numberOfGenes = 10;
+      CandidateSolution[] children = new CandidateSolution[parents.length];
 
       for(int i = 0; i < parents.length; i++) {
         int PCI = 0;
@@ -161,8 +162,9 @@ public class Population {
           }
           PCI = CTI;
         }
+        children[i] = tmpChild;
       }
-      return parents;
+      return children;
     }
     
     public void shuffleArray(double[] ar){
