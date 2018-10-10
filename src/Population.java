@@ -153,10 +153,16 @@ public class Population {
         int PCI = 0;
         CandidateSolution tmpChild = new CandidateSolution(this.random, -1, -1);
         while (PCI < numberOfGenes) {
-          int CTI = randInt(PCI, numberOfGenes-1);
+          int CTI = -1;
+          if(PCI != numberOfGenes-1) {
+            CTI = randInt(PCI+1, numberOfGenes);
+          } else {
+            CTI = numberOfGenes;
+          }
+
           int randomParent = randInt(0, parents.length-1);
           CandidateSolution parent = parents[randomParent];
-          for(int j = PCI; PCI < CTI; j++) {
+          for(int j = PCI; j < CTI; j++) {
             tmpChild.genotype[j] = parent.genotype[j];
           }
           PCI = CTI;
