@@ -23,7 +23,7 @@ public class Population {
     SurvivorSelection survivorSelectionMethod;
     RecombinationOperator recombinationOperator;
 
-    Population(int populationSize, int numberOfParents, int numberOfParentSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
+    Population(int populationSize, int numberOfParents, int numberOfParentSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random, int parentSelection, int survivorSelection, int recombinationOperator){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
         this.populationSize = populationSize;
@@ -34,14 +34,34 @@ public class Population {
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
-
         this.tournamentSize = 4;
 
-        // TODO: this needs to be dynamic
         this.parentSelectionMethod = ParentSelection.TOURNAMENT;
         this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
         this.recombinationOperator = RecombinationOperator.NR2C;
 
+        switch (parentSelection){
+          case 0 :
+            this.parentSelectionMethod = ParentSelection.RANDOM;
+          case 1 :
+            this.parentSelectionMethod = ParentSelection.FITTEST_HIGHER_PROBABILITY;
+          case 2 :
+            this.parentSelectionMethod = ParentSelection.TOURNAMENT;
+        }
+        switch (survivorSelection){
+          case 0 :
+            this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
+          case 1 :
+            this.survivorSelectionMethod = SurvivorSelection.TOURNAMENT;
+        }
+        switch (recombinationOperator){
+          case 0 :
+            this.recombinationOperator = RecombinationOperator.NR2C;
+          case 1 :
+            this.recombinationOperator = RecombinationOperator.DIAGONAL;
+          case 2 :
+            this.recombinationOperator = RecombinationOperator.BAG_OF_GENES;
+        }
         init();
     }
 
