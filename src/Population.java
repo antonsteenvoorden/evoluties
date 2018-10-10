@@ -34,8 +34,7 @@ public class Population {
         this.bestCandidate = null;
         this.bestFitness = -9000;
         this.random = random;
-
-        this.tournamentSize = 4;
+        this.tournamentSize = 10;
 
         // TODO: this needs to be dynamic
         this.parentSelectionMethod = ParentSelection.TOURNAMENT;
@@ -87,17 +86,18 @@ public class Population {
     // make children
     // select best 100 as survivors
     public void createNewGeneration(){
-      ArrayList<CandidateSolution> newPopulation = new ArrayList<CandidateSolution>();
+      ArrayList<CandidateSolution> newPopulation = new ArrayList<>();
       for(int i=0; i< this.numberOfParentSelections; i++){
         CandidateSolution[] parents = parentSelection();
-        // System.out.println("Na parentSelection");
         CandidateSolution[] children = generateChildren(parents);
-        // System.out.println("Na generateChildren");
+        // mutate each child, evaluate and add to new generation
         for(CandidateSolution sol: children){
+          sol.mutate();
           evaluateChild(sol);
           newPopulation.add(sol);
         }
       }
+      //replace entire population by new generation
       this.population = newPopulation;
     }
 
