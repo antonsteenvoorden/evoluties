@@ -8,7 +8,7 @@ public class Population {
     ArrayList<CandidateSolution> population;
     ContestEvaluation evaluation;
     int populationSize;
-    int numberOfParentsSelections;
+    int numberOfParents;
     double mutationChance;
     double gaussianStandardDeviation;
     double bestFitness;
@@ -20,11 +20,11 @@ public class Population {
     SurvivorSelection survivorSelectionMethod;
     RecombinationOperator recombinationOperator;
 
-    Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
+    Population(int populationSize, int numberOfParents, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
         this.populationSize = populationSize;
-        this.numberOfParentsSelections = numberOfParentsSelections;
+        this.numberOfParents = numberOfParents;
         this.mutationChance = mutationChance;
         this.gaussianStandardDeviation = gaussianStandardDeviation;
         this.bestCandidate = null;
@@ -68,7 +68,7 @@ public class Population {
     public void createNewGeneration(){
         ArrayList<CandidateSolution> newChildren = new ArrayList<>();
 
-        for(int i=0; i< this.numberOfParentsSelections; i++){
+        for(int i=0; i< this.numberOfParents; i++){
           CandidateSolution[] parents = parentSelection(this.parentSelectionMethod);
           CandidateSolution[] children = generateChildren(parents);
           newChildren.add(children[0]);
@@ -217,7 +217,7 @@ public class Population {
     public void survivorSelection (ArrayList<CandidateSolution> solutions) {
         // ff geen switch
         if(this.survivorSelectionMethod == SurvivorSelection.REMOVE_WORST){
-            this.population.subList(this.population.size() - this.numberOfParentsSelections*2, this.population.size()).clear();
+            this.population.subList(this.population.size() - this.numberOfParents*2, this.population.size()).clear();
             for(CandidateSolution sol: solutions){
                 this.population.add(sol);
             }
