@@ -81,8 +81,7 @@ public class Population {
         tmpSolutions.addAll(newChildren);
         newChildren = tmpSolutions;
       }
-      evaluateChildren(new_children);
-      survivorSelection(new_children);
+      survivorSelection(newChildren);
       printPopulation();
     }
 
