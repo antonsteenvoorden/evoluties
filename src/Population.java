@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,13 +123,13 @@ public class Population {
     //crossover
     public CandidateSolution[] generateChildren (CandidateSolution[] parents) {
         if(this.recombinationOperator == RecombinationOperator.ONE_POINT_CROSS_OVER) {
-          return onePointCrossOver(parents);
+            return onePointCrossOver(parents);
         } else if(this.recombinationOperator == RecombinationOperator.NR2C) {
-          return NR2C(parents);
+            return NR2C(parents);
         } else if(this.recombinationOperator == RecombinationOperator.BAG_OF_GENES) {
-          return BAG_OF_GENES(parents);
+            return bagOfGenes(parents);
         } else if(this.recombinationOperator == RecombinationOperator.DIAGONAL) {
-
+            return diagonal(parents);
         }
         // default is one point crossover
         return onePointCrossOver(parents);
@@ -164,7 +165,7 @@ public class Population {
           for(int j = PCI; j < CTI; j++) {
             tmpChild.genotype[j] = parent.genotype[j];
           }
-          PCI = CTI;
+          PCI = CI;
         }
         children[i] = tmpChild;
       }
@@ -182,7 +183,7 @@ public class Population {
       }
     }
 
-    public CandidateSolution[] BAG_OF_GENES(CandidateSolution[] parents) {
+    public CandidateSolution[] bagOfGenes(CandidateSolution[] parents) {
       int numberOfGenes = 10;
       double[][] bags = new double[numberOfGenes][parents.length];
       CandidateSolution[] children = new CandidateSolution[parents.length];
@@ -204,6 +205,45 @@ public class Population {
         }
       }
       return children;
+    }
+
+    public CandidateSolution[] diagonal(CandidateSolution[] parents) {
+        int numberOfGenes = 10;
+        ArrayList<Integer> CIs = new ArrayList<Integer>();
+        ArrayList<Integer> PIs = new ArrayList<Integer>();
+        int PCI = 0;
+        CIs.add(PCI);
+
+        // produce empty children, random cutoff indices and parent indices.
+        ArrayList<CandidateSolution> children = new ArrayList<CandidateSolution>();
+        for (int i = 0; i < parents.length; i++) {
+            while (PCI < numberOfGenes) {
+                CIs.add(randInt(PCI, numberOfGenes-1));
+                PCI = CIs.get(CIs.size()-1);
+                PIs.add(randInt(0, parents.length-1));
+                children.add(new CandidateSolution(this.random, -1, -1));
+            }
+            PIs.add(randInt(0, parents.length-1));
+            children.add(new CandidateSolution(this.random, -1, -1));
+            break;
+        }
+
+        // Do the diagonal crossover
+        for (int child = 0; child < children.size(); child++) {
+            for (int index = 0; index < PIs.size(); index++) {  // PIs en CIs is same size
+                int converted_I;
+                if (index + child < PIs.size()) {
+                    converted_I = index + child;
+                } else {
+                    converted_I = index + child - PIs.size();
+                }
+                children.get(child).genotype[CIs.get(converted_I)] = parents[PIs.get(converted_I)].genotype[CIs.get(converted_I)];
+            }
+        }
+
+        // Get to result format of other methods
+        CandidateSolution[] final_children = new CandidateSolution[children.size()];
+        for (int l = 0; l < final_children.length; l++) final_children[l] = children.get(l);
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
