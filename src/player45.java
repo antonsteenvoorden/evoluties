@@ -45,7 +45,7 @@ public class player45 implements ContestSubmission {
 
         double bash_input[] = new double[7];
         try { bash_input[0] = Double.parseDouble(System.getProperty("pop_size")); } catch (NullPointerException e){ bash_input[0] = 100; }
-        try { bash_input[1] = Double.parseDouble(System.getProperty("n_par")); } catch (NullPointerException e) { bash_input[1] = 20; }
+        try { bash_input[1] = Double.parseDouble(System.getProperty("n_par")); } catch (NullPointerException e) { bash_input[1] = 2; }
         try { bash_input[2] = Double.parseDouble(System.getProperty("m_chance")); } catch (NullPointerException e) { bash_input[2] = 0.1; }
         try { bash_input[3] = Double.parseDouble(System.getProperty("gs_dev")); } catch (NullPointerException e) { bash_input[3] = 1; }
         try { bash_input[4] = Double.parseDouble(System.getProperty("par_sel")); } catch (NullPointerException e) { bash_input[4] = 0; }
@@ -77,13 +77,13 @@ public class player45 implements ContestSubmission {
         Population population = new Population(populationSize, numberOfParents, numberOfParentSelections, mutationChance, gaussianStandardDeviation, evaluation_, rnd_, parentSelection, survivorSelection, recombinationOperator);
         evals += populationSize;
         // calculate fitness
-        while (evals < evaluations_limit_ - populationSize) {
+        while (evals < evaluations_limit_) {
             System.out.println(evals);
             population.createNewGeneration();
             // System.out.println()
             generation++;
-            evals += numberOfParents; //Check if this is still right with number of children.
-            currentEvals += numberOfParents;
+            evals += populationSize; //Check if this is still right with number of children.
+            currentEvals += populationSize;
             if(currentEvals >= printSplit){
               currentEvals = 0;
               // population.printPopulation();
