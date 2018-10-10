@@ -19,7 +19,7 @@ if [ "$string" = "bent" ]; then
     echo ${total_score}
 fi
 
-if [ "$string" = "Sphere" ]; then
+if [ "$string" = "sphere" ]; then
   echo "Sphere"
   total_score=0.0
   for i in {1..5}
@@ -32,7 +32,7 @@ if [ "$string" = "Sphere" ]; then
   echo ${total_score}
 fi
 
-if [ "$string" = "Schaffers" ]; then
+if [ "$string" = "schaffers" ]; then
   echo "Schaffers"
   total_score=0.0
   for i in {1..5}
@@ -45,7 +45,7 @@ if [ "$string" = "Schaffers" ]; then
   echo ${total_score}
 fi
 
-if [ "$string" = 'Katsuura' ]; then
+if [ "$string" = 'katsuura' ]; then
   echo "Katsuura"
   total_score=0.0
   for i in {1..5}

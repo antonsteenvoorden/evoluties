@@ -35,10 +35,11 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     }
 
     public void printSolution(){
+        String output_string = "";
         for(double allele: this.genotype){
-          System.out.printf("%.2f,", allele);
+          output_string = output_string+Double.toString(allele);
         }
-        System.out.printf("%.2f\n", this.fitness);
+        System.out.println(output_string + "fit: " + this.fitness);
     }
 
     public double[] getGenotype(){

@@ -82,7 +82,6 @@ public class Population {
         newChildren = tmpSolutions;
       }
       survivorSelection(newChildren);
-      printPopulation();
     }
 
     public void printPopulation() {
@@ -171,7 +170,7 @@ public class Population {
       }
       return children;
     }
-    
+
     public void shuffleArray(double[] ar){
       Random rnd = this.random;
       for (int i = ar.length - 1; i > 0; i--)
