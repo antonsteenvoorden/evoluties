@@ -9,7 +9,7 @@ public class Population {
     ArrayList<CandidateSolution> population;
     ContestEvaluation evaluation;
     int populationSize;
-    int numberOfParentsSelections;
+    int numberOfParents;
     double mutationChance;
     double gaussianStandardDeviation;
     double bestFitness;
@@ -21,11 +21,11 @@ public class Population {
     SurvivorSelection survivorSelectionMethod;
     RecombinationOperator recombinationOperator;
 
-    Population(int populationSize, int numberOfParentsSelections, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
+    Population(int populationSize, int numberOfParents, double mutationChance, double gaussianStandardDeviation, ContestEvaluation evaluation, Random random){
         this.population = new ArrayList<CandidateSolution>();
         this.evaluation = evaluation;
         this.populationSize = populationSize;
-        this.numberOfParentsSelections = numberOfParentsSelections;
+        this.numberOfParents = numberOfParents;
         this.mutationChance = mutationChance;
         this.gaussianStandardDeviation = gaussianStandardDeviation;
         this.bestCandidate = null;
@@ -69,7 +69,7 @@ public class Population {
     public void createNewGeneration(){
         ArrayList<CandidateSolution> newChildren = new ArrayList<>();
 
-        for(int i=0; i< this.numberOfParentsSelections; i++){
+        for(int i=0; i< this.numberOfParents; i++){
           CandidateSolution[] parents = parentSelection(this.parentSelectionMethod);
           CandidateSolution[] children = generateChildren(parents);
           newChildren.add(children[0]);
@@ -82,9 +82,7 @@ public class Population {
         tmpSolutions.addAll(newChildren);
         newChildren = tmpSolutions;
       }
-      evaluateChildren(new_children);
-      survivorSelection(new_children);
-      printPopulation();
+      survivorSelection(newChildren);
     }
 
     public void printPopulation() {
@@ -149,23 +147,31 @@ public class Population {
 
     public CandidateSolution[] NR2C(CandidateSolution[] parents) {
       int numberOfGenes = 10;
+      CandidateSolution[] children = new CandidateSolution[parents.length];
 
       for(int i = 0; i < parents.length; i++) {
         int PCI = 0;
         CandidateSolution tmpChild = new CandidateSolution(this.random, -1, -1);
         while (PCI < numberOfGenes) {
-          int CI = randInt(PCI, numberOfGenes-1);
+          int CTI = -1;
+          if(PCI != numberOfGenes-1) {
+            CTI = randInt(PCI+1, numberOfGenes);
+          } else {
+            CTI = numberOfGenes;
+          }
+
           int randomParent = randInt(0, parents.length-1);
           CandidateSolution parent = parents[randomParent];
-          for(int j = PCI; PCI < CI; j++) {
+          for(int j = PCI; j < CTI; j++) {
             tmpChild.genotype[j] = parent.genotype[j];
           }
           PCI = CI;
         }
+        children[i] = tmpChild;
       }
-      return parents;
+      return children;
     }
-    
+
     public void shuffleArray(double[] ar){
       Random rnd = this.random;
       for (int i = ar.length - 1; i > 0; i--)
@@ -251,7 +257,7 @@ public class Population {
     public void survivorSelection (ArrayList<CandidateSolution> solutions) {
         // ff geen switch
         if(this.survivorSelectionMethod == SurvivorSelection.REMOVE_WORST){
-            this.population.subList(this.population.size() - this.numberOfParentsSelections*2, this.population.size()).clear();
+            this.population.subList(this.population.size() - this.numberOfParents*2, this.population.size()).clear();
             for(CandidateSolution sol: solutions){
                 this.population.add(sol);
             }

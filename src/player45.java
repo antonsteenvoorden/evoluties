@@ -51,7 +51,7 @@ public class player45 implements ContestSubmission {
 
 
         final int populationSize = (int)bash_input[0];
-        final int numberOfParentsSelections = (int)bash_input[1];
+        final int numberOfParents = (int)bash_input[1];
 
         final double mutationChance = bash_input[2];
         final double gaussianStandardDeviation = bash_input[3];
@@ -61,14 +61,23 @@ public class player45 implements ContestSubmission {
         int evals = 0;
         int generation = 0;
 
+        int numberOfPrints = 10;
+        int currentEvals = 0;
+        int printSplit = evaluations_limit_ / numberOfPrints;
+
         // init population
-        Population population = new Population(populationSize, numberOfParentsSelections, mutationChance, gaussianStandardDeviation, evaluation_, rnd_);
+        Population population = new Population(populationSize, numberOfParents, mutationChance, gaussianStandardDeviation, evaluation_, rnd_);
         evals += populationSize;
         // calculate fitness
         while (evals < evaluations_limit_) {
             population.createNewGeneration();
             generation++;
-            evals += numberOfParentsSelections*2;
+            evals += numberOfParents*2; //Check if this is still right with number of children.
+            currentEvals += numberOfParents*2;
+            if(currentEvals >= printSplit){
+              currentEvals = 0;
+              population.printPopulation();
+            }
         }
     }
 }
