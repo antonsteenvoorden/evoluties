@@ -109,7 +109,6 @@ public class testplayer implements ContestSubmission {
 
         int eigeneval = 0;
         double chiN = Math.pow(N, 0.5)*(1-1/(4*N) + 1/(21*Math.pow(N,2)));
-
         int generations = 0;
         while (evals < (10000-lambda)) {
           generations += 1;
@@ -165,12 +164,12 @@ public class testplayer implements ContestSubmission {
 
           sigma = sigma * Math.exp((cs/damps)*(ps.norm()/chiN -1));
           if(evals - eigeneval > lambda/(c1+cmu)/N/10){
-            // eigeneval = evals;
-            // C = C.triu(0).plus(C.triu(1).transpose());
-            // EigenvalueDecomposition ED = C.eig();
-            // B = ED.getV();
-            // D = ED.getD().diagonal(true).sqrt();
-            // C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
+            eigeneval = evals;
+            C = C.triu(0).plus(C.triu(1).transpose());
+            EigenvalueDecomposition ED = C.eig();
+            B = ED.getV();
+            D = ED.getD().diagonal(true).sqrt();
+            C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
           }
         }
     }

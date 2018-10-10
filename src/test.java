@@ -27,7 +27,7 @@ class test   {
       Maths matrixMath = new Maths();
 
       int evals = 0;
-      int evaluations_limit_ = 300;
+      int evaluations_limit_ = 10000;
 
       //initialization
       int N = 3;
@@ -36,9 +36,8 @@ class test   {
       _xmean[1][0] = 50.0;
       _xmean[2][0] = 4.0;
       Matrix xmean = new Matrix(_xmean);
-      double sigma = 4;
+      double sigma = 50;
       int lambda = 4+(int)Math.floor(3*Math.log(N));
-      // lambda = 100;
       int mu = (int)Math.floor(lambda/2);
 
       double[][] _weigths = new double[mu][1];
@@ -70,7 +69,7 @@ class test   {
       double chiN = Math.pow(N, 0.5)*(1-1/(4*N) + 1/(21*Math.pow(N,2)));
 
       int generations = 0;
-      while (evals < evaluations_limit_/*generations <1*/) {
+      while (evals < evaluations_limit_) {
         generations += 1;
         //here we actually start..
         ArrayList<testCandidateSolution> population = new ArrayList<testCandidateSolution>();
@@ -138,49 +137,59 @@ class test   {
         if(!hsig) C = C.plus(oldC.times(c1*(cc*(2-cc))));
 
         sigma = sigma * Math.exp((cs/damps)*(ps.norm()/chiN -1));
-        if(evals - eigeneval > lambda/(c1+cmu)/N/10){
-          // eigeneval = evals;
-          // C = C.triu(0).plus(C.triu(1).transpose());
-          // EigenvalueDecomposition ED = C.eig();
-          // B = ED.getV();
-          // D = ED.getD().diagonal(true).sqrt();
-          // C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
+        if(evals - eigeneval > lambda/(c1+cmu)/N/100){
+          eigeneval = evals;
+          C = C.triu(0).plus(C.triu(1).transpose());
+          EigenvalueDecomposition ED = C.eig();
+          B = ED.getV();
+          D = ED.getD().diagonal(true).sqrt();
+          C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
         }
+        int _lambda = (int)population.get(0).lambda;
+        int _mu = (int)population.get(0).mu;
+        // if(_mu > _lambda/2 || _mu < 0) _mu = (int)Math.floor(_lambda/2);
+        double _sigma = population.get(0).sigma;
+        if(_sigma < 0) _sigma = Math.abs(_sigma);
+        double _fitness = population.get(0).fitness;
+        System.out.printf("Fitness: %.15f, Lambda: %d, Mu: %d, Sigma: %.2f\n", _fitness, _lambda, _mu, _sigma);
     }
   }
 
     public static double evaluate(testCandidateSolution sol){
       int lambda = (int)sol.lambda;
       int mu = (int)sol.mu;
-      if(mu > lambda/2 || mu < 0) mu = (int)Math.floor(lambda/2);
+      if(mu <= 0) sol.mu = mu = 1;
+      if(mu > lambda) sol.lambda = lambda = mu;
       double sigma = sol.sigma;
       if(sigma < 0) sigma = Math.abs(sigma);
+      if(sigma == 0) sigma = 0.0;
+      double end_result = 0;
+      for(int i=1; i<11; i++){
+        String command = String.format("java -Dlambda=%d -Dmu=%d -Dsigma=%.2f -jar testrun.jar -submission=testplayer -evaluation=BentCigarFunction -seed=%d", lambda, mu, sigma, i);
+        // System.out.println(command);
+        try{
+          Process proc = Runtime.getRuntime().exec(command);
+          BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+          BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-      String command = String.format("java -Dlambda=%d -Dmu=%d -Dsigma=%.2f -jar testrun.jar -submission=testplayer -evaluation=BentCigarFunction -seed=1", lambda, mu, sigma);
-      System.out.println(command);
-      try{
-        Process proc = Runtime.getRuntime().exec(command);
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+          // String s = null;
+          // while((s = stdInput.readLine()) != null){
+          //   System.out.println(s);
+          // }
+          //
+          // s = null;
+          // while((s = stdError.readLine()) != null){
+          //   System.out.println(s);
+          // }
+          // return 0.0;
 
-        // String s = null;
-        // while((s = stdInput.readLine()) != null){
-        //   System.out.println(s);
-        // }
-        //
-        // s = null;
-        // while((s = stdError.readLine()) != null){
-        //   System.out.println(s);
-        // }
-        // return 0.0;
-
-        String s = stdInput.readLine();
-        System.out.println(s);
-        System.out.println(s.split(" ")[1]);
-        return  Double.parseDouble(s.split(" ")[1]);
-      }catch(IOException e){
-        System.out.println("Da ging nie goe");
+          String s = stdInput.readLine();
+          // System.out.println(s.split(" ")[1]);
+          end_result += Double.parseDouble(s.split(" ")[1]);
+        }catch(IOException e){
+          System.out.println("Da ging nie goe");
+        }
       }
-      return 0.0;
+      return end_result/10;
     }
 }

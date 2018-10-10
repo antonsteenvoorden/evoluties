@@ -13,8 +13,15 @@ public class player45 implements ContestSubmission {
     ContestEvaluation evaluation_;
     private int evaluations_limit_;
 
+    int lambda;
+    int mu;
+    double sigma;
+
     public player45() {
         rnd_ = new Random();
+        this.lambda = 100;
+        this.mu = 50;
+        this.sigma = 4;
     }
 
     public void setSeed(long seed) {
@@ -37,15 +44,31 @@ public class player45 implements ContestSubmission {
         boolean isSeparable = Boolean.parseBoolean(props.getProperty("Separable"));
 
         // Do sth with property values, e.g. specify relevant settings of your algorithm
-        if (isMultimodal) {
-            // Do sth
-        } else {
-            // Do sth else
+        //Bent-Cigar: Dlambda=58 -Dmu=29 -Dsigma=11.56
+        //Fitness: 9.999999997032125, Lambda: 88, Mu: 21, Sigma: 10.52  (test: sigma 10)
+        //Fitness: 9.999999999897412, Lambda: 59, Mu: 29, Sigma: 8.21   (test: sigma 5)
+        //Fitness: 9.999999991405955, Lambda: 98, Mu: 22, Sigma: 5.39   (test: sigma 1)
+        this.lambda = 58;
+        this.mu = 29;
+        this.sigma = 11.56;
+        if (isMultimodal && hasStructure) {
+          //Schaffers: Regular, Multi //sigma: 4, lambda 100, mu 50
+          this.lambda = 100;
+          this.mu = 50;
+          this.sigma = 4;
+        } else if(isMultimodal){
+          // evaluations_limit_ = evaluations_limit_ / 10;
+          //Katsuura: Multi
+          //Fitness: 9.998883941645140, Lambda: 117, Mu: 55, Sigma: 15.62 (test: sigma 5)
+          //Fitness: 9.971443658216497, Lambda: 88, Mu: 34, Sigma: 2.30 (test: sigma 10)
+          //Fitness: 9.999267307401059, Lambda: 98, Mu: 49, Sigma: 1.56 (test: sigma 1)
+          // this.lambda = 117;
+          // this.mu = 55;
+          // this.sigma = 15.62;
+          this.lambda = 100;
+          this.mu = 50;
+          this.sigma = 4;
         }
-
-        //Bent-Cigar:
-        //Schaffers: Regular, Multi //sigma: 4, lambda 100, mu 50
-        //Katsuura: Multi
     }
 
     private  double getRandomNumberInRange(int min, int max) {
@@ -72,14 +95,13 @@ public class player45 implements ContestSubmission {
           _xmean[i][0] = getRandomNumberInRange(-5, 5);
         }
         Matrix xmean = new Matrix(_xmean);
-        double sigma = 4;
-        int lambda = 4+(int)Math.floor(3*Math.log(N));
-        lambda = 100;
-        int mu = (int)Math.floor(lambda/2);
+        // double sigma = 4;
+        // int lambda = 4+(int)Math.floor(3*Math.log(N));
+        // int mu = (int)Math.floor(lambda/2);
 
-        double[][] _weigths = new double[mu][1];
-        for(int i=0; i<mu; i++){
-          _weigths[i][0] = Math.log(mu+1/2) - Math.log(i+1);
+        double[][] _weigths = new double[this.mu][1];
+        for(int i=0; i<this.mu; i++){
+          _weigths[i][0] = Math.log(this.mu+1/2) - Math.log(i+1);
           // _weigths[i][0] = mu + 1 - i;
         }
         Matrix weigths = new Matrix(_weigths);
@@ -106,11 +128,12 @@ public class player45 implements ContestSubmission {
         double chiN = Math.pow(N, 0.5)*(1-1/(4*N) + 1/(21*Math.pow(N,2)));
 
         int generations = 0;
-        while (evals < evaluations_limit_/*generations <1*/) {
+        System.out.println(evaluations_limit_);
+        while (evals < (evaluations_limit_-this.mu)/*generations <1*/) {
           generations += 1;
           //here we actually start..
           ArrayList<CandidateSolution> population = new ArrayList<CandidateSolution>();
-          for(int i=0; i<lambda; i++){
+          for(int i=0; i<this.lambda; i++){
             CandidateSolution child = new CandidateSolution(rnd_);
             double[][] _tmp = new double[N][1];
             for(int j=0; j<N; j++){
@@ -118,7 +141,7 @@ public class player45 implements ContestSubmission {
             }
             Matrix tmp = new Matrix(_tmp);
 
-            Matrix new_x = xmean.plus(B.times(sigma).times(tmp));
+            Matrix new_x = xmean.plus(B.times(this.sigma).times(tmp));
             double[] new_genome = new double[N];
             for(int j=0; j<N; j++){
               new_genome[j] = new_x.get(j, 0);
@@ -133,39 +156,39 @@ public class player45 implements ContestSubmission {
           Matrix xold = xmean.copy();
           for(int i=0; i<N; i++){
             double result = 0;
-            for(int j=0 ;j<mu; j++){
+            for(int j=0 ;j<this.mu; j++){
               result += population.get(j).genotype[i] * weigths.get(j,0);
             }
             xmean.set(i, 0,result);
           }
 
-          ps = ps.times((1-cs)).plus(C_invsqrt.times(xmean.minus(xold)).times(Math.sqrt(cs*(2-cs)*mu_eff)).times(1/sigma));
-          hsig = ps.norm()/Math.sqrt(1-Math.pow((1-cs),(2*evals/lambda)))/chiN < 1.4 + 2/(N+1);
+          ps = ps.times((1-cs)).plus(C_invsqrt.times(xmean.minus(xold)).times(Math.sqrt(cs*(2-cs)*mu_eff)).times(1/this.sigma));
+          hsig = ps.norm()/Math.sqrt(1-Math.pow((1-cs),(2*evals/this.lambda)))/chiN < 1.4 + 2/(N+1);
 
           pc = pc.times((1-cc));
-          if(hsig) pc = xmean.minus(xold).times(Math.sqrt(cc*(2-cc)*mu_eff)).times(1/sigma);
+          if(hsig) pc = xmean.minus(xold).times(Math.sqrt(cc*(2-cc)*mu_eff)).times(1/this.sigma);
 
-          double[][] tmp = new double[N][mu];
+          double[][] tmp = new double[N][this.mu];
           for(int i=0; i<N; i++){
-            for(int j=0; j<mu; j++){
+            for(int j=0; j<this.mu; j++){
               tmp[i][j] = population.get(j).genotype[i] - xold.get(i,0);
             }
           }
           Matrix artmp = new Matrix(tmp);
-          artmp = artmp.times(1/sigma);
+          artmp = artmp.times(1/this.sigma);
 
           Matrix oldC = C;
           C = oldC.times((1-c1-cmu)).plus(pc.times(pc.transpose()).times(c1)).plus(artmp.times(weigths.diagonal(false)).times(artmp.transpose()).times(cmu));
           if(!hsig) C = C.plus(oldC.times(c1*(cc*(2-cc))));
 
-          sigma = sigma * Math.exp((cs/damps)*(ps.norm()/chiN -1));
-          if(evals - eigeneval > lambda/(c1+cmu)/N/10){
-            // eigeneval = evals;
-            // C = C.triu(0).plus(C.triu(1).transpose());
-            // EigenvalueDecomposition ED = C.eig();
-            // B = ED.getV();
-            // D = ED.getD().diagonal(true).sqrt();
-            // C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
+          this.sigma = this.sigma * Math.exp((cs/damps)*(ps.norm()/chiN -1));
+          if(evals - eigeneval > this.lambda/(c1+cmu)/N*10){
+            eigeneval = evals;
+            C = C.triu(0).plus(C.triu(1).transpose());
+            EigenvalueDecomposition ED = C.eig();
+            B = ED.getV();
+            D = ED.getD().diagonal(true).sqrt();
+            C_invsqrt = B.times(D.powerinverse().diagonal(false)).times(B.transpose());
           }
         }
     }
