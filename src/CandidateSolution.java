@@ -37,9 +37,9 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
     public void printSolution(){
         String output_string = "";
         for(double allele: this.genotype){
-          output_string = output_string+Double.toString(allele);
+          output_string = output_string + Double.toString(allele) + ",";
         }
-        System.out.println(output_string + "fit: " + this.fitness);
+        System.out.println(output_string + this.fitness);
     }
 
     public double[] getGenotype(){
