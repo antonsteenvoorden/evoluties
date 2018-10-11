@@ -37,10 +37,6 @@ public class Population {
 
         this.tournamentSize = 10;
 
-//        this.parentSelectionMethod = ParentSelection.TOURNAMENT;
-//        this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
-//        this.recombinationOperator = RecombinationOperator.NR2C;
-
         switch (parentSelection){
           case 0 :
             this.parentSelectionMethod = ParentSelection.RANDOM;
