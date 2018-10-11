@@ -37,9 +37,9 @@ public class Population {
 
         this.tournamentSize = 10;
 
-        this.parentSelectionMethod = ParentSelection.TOURNAMENT;
-        this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
-        this.recombinationOperator = RecombinationOperator.NR2C;
+//        this.parentSelectionMethod = ParentSelection.TOURNAMENT;
+//        this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
+//        this.recombinationOperator = RecombinationOperator.NR2C;
 
         switch (parentSelection){
           case 0 :
@@ -227,7 +227,6 @@ public class Population {
 
     public CandidateSolution[] bagOfGenes(CandidateSolution[] parents) {
       int numberOfGenes = 10;
-      double[][] bags = new double[numberOfGenes][parents.length];
       CandidateSolution[] children = new CandidateSolution[parents.length];
       //make children
       for (int g = 0; g<parents.length; g++){
@@ -250,45 +249,36 @@ public class Population {
     }
 
     public CandidateSolution[] diagonal(CandidateSolution[] parents) {
-        // System.out.println("Begin diagonal");
         int numberOfGenes = 10;
-        ArrayList<Integer> CIs = new ArrayList<Integer>();
-        ArrayList<Integer> PIs = new ArrayList<Integer>();
-        int PCI = 0;
-        CIs.add(PCI);
+        int[] CIs = new int[parents.length];
 
-        // produce empty children, random cutoff indices and parent indices.
-        ArrayList<CandidateSolution> children = new ArrayList<CandidateSolution>();
+        // produce empty children
+        CandidateSolution[] children = new CandidateSolution[parents.length];
         for (int i = 0; i < parents.length; i++) {
-            while (PCI < numberOfGenes-1) {
-                CIs.add(randInt(PCI+1, numberOfGenes-1));
-                PCI = CIs.get(CIs.size()-1);
-                PIs.add(randInt(0, parents.length-1));
-                children.add(new CandidateSolution(this.random, -1, -1));
-            }
-            PIs.add(randInt(0, parents.length-1));
-            children.add(new CandidateSolution(this.random, -1, -1));
-            break;
+            children[i] = new CandidateSolution(this.random, -1, -1);
         }
 
-        // System.out.println("begin diagonal crossover");
+        // create cutoff indices
+        int CI = 0;
+        CIs[0] = CI;
+        for (int i = 0; i < parents.length - 1; i++) {
+            CI = CI + (numberOfGenes / parents.length);
+            CIs[i+1] = CI;
+        }
+
         // Do the diagonal crossover
-        for (int child = 0; child < children.size(); child++) {
-            for (int index = 0; index < PIs.size(); index++) {  // PIs en CIs is same size
-                int converted_I;
-                if (index + child < PIs.size()) {
-                    converted_I = index + child;
+        for (int child = 0; child < children.length; child++) {
+            for (int PI = 0; PI < parents.length; PI++) {
+                int converted_PI;
+                if (PI + child < parents.length) {
+                    converted_PI = PI + child;
                 } else {
-                    converted_I = index + child - PIs.size();
+                    converted_PI = PI + child - parents.length;
                 }
-                children.get(child).genotype[CIs.get(converted_I)] = parents[PIs.get(converted_I)].genotype[CIs.get(converted_I)];
+                children[child].genotype[CIs[PI]] = parents[converted_PI].genotype[CIs[PI]];
             }
         }
-
-        // Get to result format of other methods
-        CandidateSolution[] final_children = new CandidateSolution[children.size()];
-        for (int l = 0; l < final_children.length; l++) final_children[l] = children.get(l);
-        return final_children;
+        return children;
     }
 
     public CandidateSolution crossOver (CandidateSolution c1, CandidateSolution c2){
@@ -306,7 +296,7 @@ public class Population {
             for(CandidateSolution sol: solutions){
                 this.population.add(sol);
             }
-        } else if(this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
+        } else (this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
             // pick 2 at random, add the one with the highest fitness to the population.
         }
 

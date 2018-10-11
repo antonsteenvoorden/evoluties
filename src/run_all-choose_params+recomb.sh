@@ -2,8 +2,9 @@
 
 #Running example
 # bash run_all-choose_params+recomb.sh -pop 10 -n 1 -m 1 -gs 1 -ps 0 -ss 0 -ro 0
-# population, number of parents, mutation rate, gaussian something, parent selection, survival selection, recombination operator
+# population, number of parents, mutation rate, gaussian standard deviation, parent selection, survival selection, recombination operator
 # -ps,-ss,-ro are defined as in their specific classes (so 0 is the first etc.)
+
 javac -cp contest.jar player45.java Population.java CandidateSolution.java ParentSelection.java SurvivorSelection.java RecombinationOperator.java
 jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class ParentSelection.class SurvivorSelection.class RecombinationOperator.class
 
