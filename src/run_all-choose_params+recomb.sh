@@ -51,8 +51,10 @@ for i in {1..30}
 do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
   vars=( $var )
-  total_score_Bent=`echo ${total_score_Bent} + ${vars[1]} | bc`
-#  echo "${vars[1]}"
+#  echo ${vars}
+  total_score_Bent=`echo ${total_score_Bent} + ${vars[-3]} | bc`
+#  echo ${total_score_Bent}
+ echo "${vars[-3]}"
 done
 total_score_Bent=`echo ${total_score_Bent} / $i | bc -l`
 echo "Average over 30 runs is... ${total_score_Bent}"
@@ -63,8 +65,8 @@ for i in {1..30}
 do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=SphereEvaluation -seed=$i)"
   vars=( $var )
-  total_score_Sphere=`echo ${total_score_Sphere} + ${vars[1]} | bc`
-#  echo "${vars[1]}"
+  total_score_Sphere=`echo ${total_score_Sphere} + ${vars[-3]} | bc`
+  echo "${vars[-3]}"
 done
 total_score_Sphere=`echo ${total_score_Sphere} / $i | bc -l`
 echo "Average over 30 runs is... ${total_score_Sphere}"
@@ -76,7 +78,7 @@ for i in {1..30}
 do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=SchaffersEvaluation -seed=$i)"
   vars=( $var )
-  total_score_Schaffers=`echo ${total_score_Schaffers} + ${vars[1]} | bc`
+  total_score_Schaffers=`echo ${total_score_Schaffers} + ${vars[-3]} | bc`
 #  echo "${vars[1]}"
 done
 total_score_Schaffers=`echo ${total_score_Schaffers} / $i | bc -l`
@@ -89,7 +91,7 @@ for i in {1..30}
 do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=KatsuuraEvaluation -seed=$i)"
   vars=( $var )
-  total_score_Katsuura=`echo ${total_score_Katsuura} + ${vars[1]} | bc`
+  total_score_Katsuura=`echo ${total_score_Katsuura} + ${vars[-3]} | bc`
 #  echo "${vars[1]}"
 done
 total_score_Katsuura=`echo ${total_score_Katsuura} / $i | bc -l`

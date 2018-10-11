@@ -44,24 +44,32 @@ public class Population {
         switch (parentSelection){
           case 0 :
             this.parentSelectionMethod = ParentSelection.RANDOM;
+            break;
           case 1 :
             this.parentSelectionMethod = ParentSelection.FITTEST_HIGHER_PROBABILITY;
+            break;
           case 2 :
             this.parentSelectionMethod = ParentSelection.TOURNAMENT;
+            break;
         }
         switch (survivorSelection){
           case 0 :
             this.survivorSelectionMethod = SurvivorSelection.REMOVE_WORST;
+            break;
           case 1 :
             this.survivorSelectionMethod = SurvivorSelection.TOURNAMENT;
+            break;
         }
         switch (recombinationOperator){
           case 0 :
             this.recombinationOperator = RecombinationOperator.NR2C;
+            break;
           case 1 :
             this.recombinationOperator = RecombinationOperator.DIAGONAL;
+            break;
           case 2 :
             this.recombinationOperator = RecombinationOperator.BAG_OF_GENES;
+            break;
         }
         init();
     }
