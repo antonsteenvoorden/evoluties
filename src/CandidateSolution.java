@@ -92,6 +92,11 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
       for(int i=0; i<genotype.length; i++){
         if(this.random.nextDouble() < this.mutationChance){
           genotype[i] += this.random.nextGaussian() * this.gaussianStandardDeviation;
+          if(genotype[i] < -5) {
+            genotype[i] = -4.9;
+          } else if (genotype[i] > 5) {
+            genotype[i] = 4.9;
+          }
         }
       }
     }

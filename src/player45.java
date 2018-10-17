@@ -46,7 +46,7 @@ public class player45 implements ContestSubmission {
         double bash_input[] = new double[7];
         try { bash_input[0] = Double.parseDouble(System.getProperty("pop_size")); } catch (Exception e){ bash_input[0] = 100; }
         try { bash_input[1] = Double.parseDouble(System.getProperty("n_par")); } catch (Exception e) { bash_input[1] = 2; }
-        try { bash_input[2] = Double.parseDouble(System.getProperty("m_chance")); } catch (Exception e) { bash_input[2] = 0.1; }
+        try { bash_input[2] = Double.parseDouble(System.getProperty("m_chance")); } catch (Exception e) { bash_input[2] = 1; }
         try { bash_input[3] = Double.parseDouble(System.getProperty("gs_dev")); } catch (Exception e) { bash_input[3] = 0.1; }
         try { bash_input[4] = Double.parseDouble(System.getProperty("par_sel")); } catch (Exception e) { bash_input[4] = 2; }
         try { bash_input[5] = Double.parseDouble(System.getProperty("sur_sel")); } catch (Exception e) { bash_input[5] = 0; }
