@@ -156,18 +156,27 @@ public class Population {
 
     public CandidateSolution[] tournamentParentSelection() {
       CandidateSolution[] parents = new CandidateSolution[this.numberOfParents];
+      ArrayList<CandidateSolution> tmp_population = (ArrayList<CandidateSolution>) this.population.clone();
       for(int i=0; i<this.numberOfParents; i++){
-        CandidateSolution winner = this.population.get(randInt(0, this.populationSize-1));
-        for(int j=0; j<this.tournamentSize-1; j++){
-          CandidateSolution challenger = this.population.get(randInt(0, this.populationSize-1));
-          while (isAlreadyChosen(parents, challenger)){
-            challenger = this.population.get(randInt(0, this.populationSize-1));
-          }
-          if(challenger.fitness > winner.fitness){
-            winner = challenger;
+        // execute numberOfParents tournaments
+        CandidateSolution[] contesters = new CandidateSolution[this.tournamentSize];
+        ArrayList<CandidateSolution> tmp_contestors = (ArrayList<CandidateSolution>) tmp_population.clone();
+        for(int j=0; j<this.tournamentSize; j++){
+          // find tournamentSize unique contesters
+          CandidateSolution contestant = tmp_contestors.get(randInt(0, tmp_contestors.size()-1));
+          contesters[j] = contestant;
+          tmp_contestors.remove(contestant);
+        }
+        //find a winner
+        int bestFitness = -9000;
+        CandidateSolution winner = contesters[0];
+        for(int j=1; j<contesters.length; j++){
+          if(contesters[j].fitness >= bestFitness){
+            winner = contesters[j];
           }
         }
         parents[i] = winner;
+        tmp_population.remove(winner);
       }
       return parents;
     }
@@ -200,7 +209,7 @@ public class Population {
 
       for(int i = 0; i < parents.length; i++) {
         int PCI = 0;
-        CandidateSolution tmpChild = new CandidateSolution(this.random, -1, -1);
+        CandidateSolution tmpChild = new CandidateSolution(this.random, this.mutationChance, this.mutationChance);
         while (PCI < numberOfGenes) {
           int CTI = -1;
           if(PCI != numberOfGenes-1) {
@@ -210,6 +219,7 @@ public class Population {
           }
 
           int randomParent = randInt(0, parents.length-1);
+
           CandidateSolution parent = parents[randomParent];
           for(int j = PCI; j < CTI; j++) {
             tmpChild.genotype[j] = parent.genotype[j];
@@ -246,7 +256,7 @@ public class Population {
       CandidateSolution[] children = new CandidateSolution[parents.length];
       //make children
       for (int g = 0; g<parents.length; g++){
-        children[g] = new CandidateSolution(this.random, -1,-1);
+        children[g] = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
       }
       //for each ith gene select all the parents, save the genes
       for (int i = 0; i<numberOfGenes; i++) {
@@ -271,7 +281,7 @@ public class Population {
         // produce empty children
         CandidateSolution[] children = new CandidateSolution[parents.length];
         for (int i = 0; i < parents.length; i++) {
-            children[i] = new CandidateSolution(this.random, -1, -1);
+            children[i] = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
         }
 
         // create cutoff indices

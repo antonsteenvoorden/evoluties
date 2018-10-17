@@ -70,12 +70,14 @@ done;
 
 echo 'Schaffers'
 total_score_Schaffers=0.0
-for i in {1..30}
+# for i in {1..30}
+for i in {1..2}
 do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=SchaffersEvaluation -seed=$i)"
-  vars=( $var )
-  total_score_Schaffers=`echo ${total_score_Schaffers} + ${vars[-3]} | bc`
-  echo "${vars[-3]]}"
+  # vars=( $var )
+  # total_score_Schaffers=`echo ${total_score_Schaffers} + ${vars[-3]} | bc`
+  # echo "${vars[-3]]}"
+  echo "$var";
 done
 total_score_Schaffers=`echo ${total_score_Schaffers} / $i | bc -l`
 echo "Average over 30 runs is... ${total_score_Schaffers}"
@@ -83,18 +85,20 @@ echo "Average over 30 runs is... ${total_score_Schaffers}"
 
 echo 'Katsuura (run time > 30*10s = 5min, wait)'
 total_score_Katsuura=0.0
-for i in {1..30}
+# for i in {1..30}
+for i in {1..2}
 do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=KatsuuraEvaluation -seed=$i)"
-  vars=( $var )
-  total_score_Katsuura=`echo ${total_score_Katsuura} + ${vars[-3]} | bc`
-  echo "${vars[-3]}"
+  # vars=( $var )
+  # total_score_Katsuura=`echo ${total_score_Katsuura} + ${vars[-3]} | bc`
+  # echo "${vars[-3]}"
+  echo "$var"
 done
 total_score_Katsuura=`echo ${total_score_Katsuura} / $i | bc -l`
 echo "Average over 30 runs is... ${total_score_Katsuura}"
 
 
 robustness=0.0
-robustness=`echo ${total_score_Bent} + ${total_score_Katsuura} + ${total_score_Schaffers} + ${total_score_Sphere} | bc`
-robustness=`echo ${robustness} / 4 | bc -l`
+robustness=`echo ${total_score_Katsuura} + ${total_score_Schaffers} | bc`
+robustness=`echo ${robustness} / 2 | bc -l`
 echo "Robustness: average score over all 4 functions is ${robustness}"

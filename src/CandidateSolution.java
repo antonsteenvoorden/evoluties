@@ -116,4 +116,9 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
       return 0;
     }
 
+
+    public boolean equals(CandidateSolution other){
+      if (other == this) return true;
+      return false;
+    }
 }
