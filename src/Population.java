@@ -17,6 +17,7 @@ public class Population {
     double bestFitness;
     CandidateSolution bestCandidate;
     Random random;
+    boolean printing = true;
 
     // enums
     ParentSelection parentSelectionMethod;
@@ -81,7 +82,7 @@ public class Population {
 
     public void printPopulation() {
       for(CandidateSolution sol: population){
-        sol.printSolution();
+        this.printer(sol.printSolution());
       }
     }
 
@@ -292,7 +293,7 @@ public class Population {
             for(CandidateSolution sol: solutions){
                 this.population.add(sol);
             }
-        } else (this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
+        } else if (this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
             // pick 2 at random, add the one with the highest fitness to the population.
         }
 
@@ -318,5 +319,11 @@ public class Population {
       return this.random.nextInt((max - min) + 1) + min;
     }
 
-
+    // use this if you want to print something,
+    // so we can turn all print statements of by changing a single variable
+    public void printer(String output) {
+      if(this.printing) {
+        System.out.println(output);
+      }
+    }
 }

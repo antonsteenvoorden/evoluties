@@ -34,12 +34,12 @@ public class CandidateSolution implements Comparable<CandidateSolution>{
         }
     }
 
-    public void printSolution(){
+    public String printSolution(){
         String output_string = "";
         for(double allele: this.genotype){
           output_string = output_string + Double.toString(allele) + ",";
         }
-        System.out.println(output_string + this.fitness);
+        return output_string + this.fitness;
     }
 
     public double[] getGenotype(){

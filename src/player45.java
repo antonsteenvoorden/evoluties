@@ -78,15 +78,13 @@ public class player45 implements ContestSubmission {
         evals += populationSize;
         // calculate fitness
         while (evals < evaluations_limit_) {
-            // System.out.println(evals);
             population.createNewGeneration();
-            // System.out.println()
             generation++;
             evals += populationSize; //Check if this is still right with number of children.
             currentEvals += populationSize;
             if(currentEvals >= printSplit){
               currentEvals = 0;
-              // population.printPopulation();
+               population.printPopulation();
             }
         }
     }
