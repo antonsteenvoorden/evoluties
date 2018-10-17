@@ -287,9 +287,9 @@ public class Population {
         // create cutoff indices
         int CI = 0;
         CIs[0] = CI;
-        for (int i = 0; i < parents.length - 1; i++) {
+        for (int i = 1; i < parents.length - 1; i++) {
             CI = CI + (numberOfGenes / parents.length);
-            CIs[i+1] = CI;
+            CIs[i] = CI;
         }
 
         // Do the diagonal crossover
@@ -301,7 +301,15 @@ public class Population {
                 } else {
                     converted_PI = PI + child - parents.length;
                 }
-                children[child].genotype[CIs[PI]] = parents[converted_PI].genotype[CIs[PI]];
+                for (int j = 0; j < CIs.length; j++) {
+                    //System.out.println();
+                    children[child].genotype[CIs[PI] + j] = parents[converted_PI].genotype[CIs[PI] + j];
+                    if (CIs[PI]+j < parents.length - 1 && j == CIs.length - 1) {
+                        for (int k = CIs[PI] + j; k < parents.length - 1; k++) {
+                            children[child].genotype[k] = parents[converted_PI].genotype[k];
+                        }
+                    }
+                }
             }
         }
         return children;
