@@ -168,10 +168,9 @@ public class Population {
           tmp_contestors.remove(contestant);
         }
         //find a winner
-        int bestFitness = -9000;
         CandidateSolution winner = contesters[0];
         for(int j=1; j<contesters.length; j++){
-          if(contesters[j].fitness >= bestFitness){
+          if(contesters[j].fitness >= winner.fitness){
             winner = contesters[j];
           }
         }
