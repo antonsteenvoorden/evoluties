@@ -2,6 +2,7 @@ import java.lang.reflect.Array;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Arrays;
 
 import org.vu.contest.ContestEvaluation;
 
@@ -36,7 +37,7 @@ public class Population {
         this.bestFitness = -9000;
         this.random = random;
 
-        this.tournamentSize = 10;
+        this.tournamentSize = 5;
 
         switch (parentSelection){
           case 0 :
@@ -120,10 +121,17 @@ public class Population {
         // mutate each child, evaluate and add to new generation
         for(CandidateSolution sol: children){
           sol.mutate();
-          evaluateChild(sol);
+          // evaluateChild(sol);
           newPopulation.add(sol);
         }
       }
+      if(newPopulation.size() > this.population.size()){
+        //remove excess children
+        for(int diff = newPopulation.size() - this.population.size(); diff >0; diff--){
+          newPopulation.remove(newPopulation.size()-diff);
+        }
+      }
+      evaluateChildren(newPopulation);
       //replace entire population by new generation
       this.population = newPopulation;
     }
@@ -146,13 +154,15 @@ public class Population {
       return parents;
     }
 
-    //best out of k random
     public CandidateSolution[] tournamentParentSelection() {
       CandidateSolution[] parents = new CandidateSolution[this.numberOfParents];
       for(int i=0; i<this.numberOfParents; i++){
         CandidateSolution winner = this.population.get(randInt(0, this.populationSize-1));
         for(int j=0; j<this.tournamentSize-1; j++){
           CandidateSolution challenger = this.population.get(randInt(0, this.populationSize-1));
+          while (isAlreadyChosen(parents, challenger)){
+            challenger = this.population.get(randInt(0, this.populationSize-1));
+          }
           if(challenger.fitness > winner.fitness){
             winner = challenger;
           }
@@ -210,6 +220,15 @@ public class Population {
       }
       return children;
     }
+
+    public boolean isAlreadyChosen(CandidateSolution[] parents, CandidateSolution sol){
+	     for (CandidateSolution s : parents) {
+		       if (sol.equals(s)) {
+			          return true;
+		        }
+	        }
+	      return false;
+      }
 
     public void shuffleArray(double[] ar){
       Random rnd = this.random;

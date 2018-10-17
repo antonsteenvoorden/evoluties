@@ -9,68 +9,63 @@ javac -cp contest.jar player45.java Population.java CandidateSolution.java Paren
 jar cmf MainClass.txt submission.jar player45.class Population.class CandidateSolution.class ParentSelection.class SurvivorSelection.class RecombinationOperator.class
 
 echo 'Running all evaluations..'
-for ((i=1;i<=$#;i++)); 
+for ((i=1;i<=$#;i++));
 do
-    if [ ${!i} = "-pop" ] 
-    then ((i++)) 
+    if [ ${!i} = "-pop" ]
+    then ((i++))
         pop_size=${!i};
 
     elif [ ${!i} = "-n" ];
-    then ((i++)) 
-        n_par=${!i};  
+    then ((i++))
+        n_par=${!i};
 
     elif [ ${!i} = "-m" ];
-    then ((i++)) 
-        m_chance=${!i};    
+    then ((i++))
+        m_chance=${!i};
 
-    elif [ ${!i} = "-gs" ]; 
-    then ((i++)) 
+    elif [ ${!i} = "-gs" ];
+    then ((i++))
         gs_dev=${!i};
 
-    elif [ ${!i} = "-ps" ]; 
-    then ((i++)) 
+    elif [ ${!i} = "-ps" ];
+    then ((i++))
         par_sel=${!i};
 
-    elif [ ${!i} = "-ss" ]; 
-    then ((i++)) 
+    elif [ ${!i} = "-ss" ];
+    then ((i++))
         sur_sel=${!i};
 
-    elif [ ${!i} = "-ro" ]; 
-    then ((i++)) 
+    elif [ ${!i} = "-ro" ];
+    then ((i++))
         rec_ope=${!i};
     fi
 done;
-
-echo "$pop_size";
-echo "$n_par";
-echo "$m_chance";
-echo "$gs_dev";
-
-echo 'Bent Cigar'
-total_score_Bent=0.0
-for i in {1..30}
-do
-  var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
-  vars=( $var )
-#  echo ${vars}
-  total_score_Bent=`echo ${total_score_Bent} + ${vars[-3]} | bc`
-#  echo ${total_score_Bent}
- echo "${vars[-3]}"
-done
-total_score_Bent=`echo ${total_score_Bent} / $i | bc -l`
-echo "Average over 30 runs is... ${total_score_Bent}"
-
-echo 'Sphere'
-total_score_Sphere=0.0
-for i in {1..30}
-do
-  var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=SphereEvaluation -seed=$i)"
-  vars=( $var )
-  total_score_Sphere=`echo ${total_score_Sphere} + ${vars[-3]} | bc`
-  echo "${vars[-3]}"
-done
-total_score_Sphere=`echo ${total_score_Sphere} / $i | bc -l`
-echo "Average over 30 runs is... ${total_score_Sphere}"
+#
+# echo 'Bent Cigar'
+# total_score_Bent=0.0
+# for i in {1..30}
+# do
+#   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=BentCigarFunction -seed=$i)"
+#   vars=( $var )
+# #  echo ${vars}
+#   total_score_Bent=`echo ${total_score_Bent} + ${vars[-3]} | bc`
+# #  echo ${total_score_Bent}
+#  echo "${vars[-3]}"
+# done
+# total_score_Bent=`echo ${total_score_Bent} / $i | bc -l`
+# echo "Average over 30 runs is... ${total_score_Bent}"
+#
+# echo 'Sphere'
+# total_score_Sphere=0.0
+# for i in {1..30}
+# do
+#   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=SphereEvaluation -seed=$i)"
+#   vars=( $var )
+#   total_score_Sphere=`echo ${total_score_Sphere} + ${vars[-3]} | bc`
+#   echo "${vars[-3]}"
+# done
+# total_score_Sphere=`echo ${total_score_Sphere} / $i | bc -l`
+# echo "Average over 30 runs is... ${total_score_Sphere}"
 
 
 echo 'Schaffers'
@@ -80,7 +75,7 @@ do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=SchaffersEvaluation -seed=$i)"
   vars=( $var )
   total_score_Schaffers=`echo ${total_score_Schaffers} + ${vars[-3]} | bc`
-#  echo "${vars[1]}"
+  echo "${vars[-3]]}"
 done
 total_score_Schaffers=`echo ${total_score_Schaffers} / $i | bc -l`
 echo "Average over 30 runs is... ${total_score_Schaffers}"
@@ -93,7 +88,7 @@ do
   var="$(java -Dpop_size=$pop_size -Dn_par=$n_par -Dm_chance=$m_chance -Dgs_dev=$gs_dev -Dpar_sel=$par_sel -Dsur_sel=$sur_sel -Drec_ope=$rec_ope -jar testrun.jar -submission=player45 -evaluation=KatsuuraEvaluation -seed=$i)"
   vars=( $var )
   total_score_Katsuura=`echo ${total_score_Katsuura} + ${vars[-3]} | bc`
-#  echo "${vars[1]}"
+  echo "${vars[-3]}"
 done
 total_score_Katsuura=`echo ${total_score_Katsuura} / $i | bc -l`
 echo "Average over 30 runs is... ${total_score_Katsuura}"
