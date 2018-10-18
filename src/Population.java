@@ -18,7 +18,7 @@ public class Population {
     double bestFitness;
     CandidateSolution bestCandidate;
     Random random;
-    boolean printing = true;
+    boolean printing = false;
 
     // enums
     ParentSelection parentSelectionMethod;
@@ -275,7 +275,6 @@ public class Population {
 
     public CandidateSolution[] diagonal(CandidateSolution[] parents) {
         int numberOfGenes = 10;
-        int[] CIs = new int[parents.length];
 
         // produce empty children
         CandidateSolution[] children = new CandidateSolution[parents.length];
@@ -283,34 +282,62 @@ public class Population {
             children[i] = new CandidateSolution(this.random, this.mutationChance, this.gaussianStandardDeviation);
         }
 
+//        System.out.println("CI's");
         // create cutoff indices
-        int CI = 0;
-        CIs[0] = CI;
-        for (int i = 1; i < parents.length - 1; i++) {
-            CI = CI + (numberOfGenes / parents.length);
-            CIs[i] = CI;
+        int cutoffSize = (numberOfGenes / parents.length); // 5: 2, 4, 6, 8, 10
+
+        int numberOfCutoffs = parents.length-1;
+        int[] CIs = new int[numberOfCutoffs+1]; //we add 1 before the rest
+//        System.out.println("number of cutoffs ");
+//        System.out.println(numberOfCutoffs);
+//        System.out.println("cutoff size");
+//        System.out.println(cutoffSize);
+
+        CIs[0] = 0;
+        for (int i = 1; i < CIs.length; i++) {
+            int multiplier = i;
+            int tmpIndex = multiplier*cutoffSize;
+            CIs[i] = tmpIndex;
         }
 
-        // Do the diagonal crossover
         for (int child = 0; child < children.length; child++) {
-            for (int PI = 0; PI < parents.length; PI++) {
-                int converted_PI;
-                if (PI + child < parents.length) {
-                    converted_PI = PI + child;
-                } else {
-                    converted_PI = PI + child - parents.length;
-                }
-                for (int j = 0; j < CIs.length; j++) {
-                    //System.out.println();
-                    children[child].genotype[CIs[PI] + j] = parents[converted_PI].genotype[CIs[PI] + j];
-                    if (CIs[PI]+j < parents.length - 1 && j == CIs.length - 1) {
-                        for (int k = CIs[PI] + j; k < parents.length - 1; k++) {
-                            children[child].genotype[k] = parents[converted_PI].genotype[k];
-                        }
-                    }
-                }
+          CandidateSolution tmpChild = children[child];
+          // rearrange parents
+          // get parents until this starting point to put them in the back
+          ArrayList<CandidateSolution> part1 = new ArrayList<>();
+          for(int p = 0; p < child; p++) {
+            part1.add(parents[p]);
+          }
+          // all parents from the new start
+          ArrayList<CandidateSolution> part2 = new ArrayList<>();
+          for(int p = child; p < parents.length; p++) {
+            part2.add(parents[p]);
+          }
+          // put the other parents in end of list
+          part2.addAll(part1);
+
+          // get a part from each parent
+          // loop over parent parts for this child
+          for(int index = 0; index < CIs.length; index++ ) {
+            //grab cutoff for this parent
+            int tmpCI = CIs[index];
+//            System.out.println("start from");
+//            System.out.println(tmpCI);
+            CandidateSolution tmpParent = part2.get(index);
+//            System.out.println("get genes from parent");
+//            System.out.println(tmpParent);
+            // fill the child with parent genes from starting index
+            // making sure to get cutoff size amount of genes per parent
+            for(int j = tmpCI; j < numberOfGenes; j++) {
+              tmpChild.genotype[j] = tmpParent.genotype[j];
             }
+          }
+//          System.out.println("child");
+//          System.out.println(tmpChild);
         }
+//        for(int i=0; i < children.length; i++) {
+//          System.out.println(children[i]);
+//        }
         return children;
     }
 
