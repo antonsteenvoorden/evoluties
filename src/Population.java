@@ -133,7 +133,8 @@ public class Population {
       }
       evaluateChildren(newPopulation);
       //replace entire population by new generation
-      this.population = newPopulation;
+      survivorSelection(newPopulation);
+      //this.population = newPopulation;
     }
 
 
@@ -358,6 +359,7 @@ public class Population {
             }
         } else if (this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
             // pick 2 at random, add the one with the highest fitness to the population.
+            tournamentParentSelection(solutions)
         }
 
       Collections.sort(this.population);
