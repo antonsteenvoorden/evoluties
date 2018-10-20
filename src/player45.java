@@ -65,7 +65,11 @@ public class player45 implements ContestSubmission {
         int evals = 0;
         int generation = 0;
 
-        int customLimit = evalution_limit_ / 100 * 30;
+
+        int customLimit = evaluations_limit_;
+        if(evaluations_limit_ > 100000) { //only kutsuura gets lower limit
+            customLimit = evaluations_limit_ / 100 * 30;
+        }
 
         int numberOfPrints = 100;
         int currentEvals = 0;

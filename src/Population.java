@@ -133,7 +133,7 @@ public class Population {
       }
       evaluateChildren(newPopulation);
       //replace entire population by new generation
-      survivorSelection(newPopulation);
+      this.population = survivorSelection(newPopulation);
       //this.population = newPopulation;
     }
 
@@ -179,6 +179,32 @@ public class Population {
         tmp_population.remove(winner);
       }
       return parents;
+    }
+    public ArrayList<CandidateSolution> tournamentSurvivorSelection(ArrayList<CandidateSolution> population) {
+      ArrayList<CandidateSolution> newPopulation = new ArrayList<CandidateSolution>();
+
+      ArrayList<CandidateSolution> tmp_population = (ArrayList<CandidateSolution>) population.clone();
+      for(int i=0; i < this.populationSize; i++){
+        // execute numberOfParents tournaments
+        CandidateSolution[] contesters = new CandidateSolution[this.tournamentSize];
+        ArrayList<CandidateSolution> tmp_contestors = (ArrayList<CandidateSolution>) tmp_population.clone();
+        for(int j=0; j<this.tournamentSize; j++){
+          // find tournamentSize unique contesters
+          CandidateSolution contestant = tmp_contestors.get(randInt(0, tmp_contestors.size()-1));
+          contesters[j] = contestant;
+          tmp_contestors.remove(contestant);
+        }
+        //find a winner
+        CandidateSolution winner = contesters[0];
+        for(int j=1; j<contesters.length; j++){
+          if(contesters[j].fitness >= winner.fitness){
+            winner = contesters[j];
+          }
+        }
+        newPopulation.add(winner);
+        tmp_population.remove(winner);
+      }
+      return newPopulation;
     }
 
     //crossover
@@ -350,19 +376,11 @@ public class Population {
     }
 
     // remove the worst!
-    public void survivorSelection (ArrayList<CandidateSolution> solutions) {
-        // ff geen switch
-        if(this.survivorSelectionMethod == SurvivorSelection.REMOVE_WORST){
-            this.population.subList(this.population.size() - this.numberOfParents*2, this.population.size()).clear();
-            for(CandidateSolution sol: solutions){
-                this.population.add(sol);
-            }
-        } else if (this.survivorSelectionMethod == SurvivorSelection.TOURNAMENT){
-            // pick 2 at random, add the one with the highest fitness to the population.
-            tournamentParentSelection(solutions)
-        }
-
-      Collections.sort(this.population);
+    public ArrayList<CandidateSolution> survivorSelection (ArrayList<CandidateSolution> solutions) {
+      ArrayList<CandidateSolution> tmpPopulation = new ArrayList<CandidateSolution>();
+      tmpPopulation.addAll(solutions);
+      tmpPopulation.addAll(this.population);
+      return tournamentSurvivorSelection(tmpPopulation);
     }
 
     public double[] concatenateArrays(double[]... arrays){
